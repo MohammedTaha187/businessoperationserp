@@ -1,17 +1,55 @@
-# 📊 ERP System - Detailed Entity Relationship Diagram (ERD)
+# 📊 ERP System - Comprehensive Entity Relationship Diagram (ERD)
 
-![Technical ERD Visualization](public/images/erd.png)
+![Full System ERD Visualization](public/images/erd_new.png)
 
-هذا الرسم يوضح الجداول مع الحقول (Fields) والعلاقات (Relationships) بشكل تفصيلي بنفس أسلوب الصورة التي أرفقتها.
+هذا الرسم يوضح الهيكلية المتكاملة للنظام (Full ERP Architecture) والتي تشمل أنظمة فرعية (CRM, HR, Accounting, etc.).
 
 ```mermaid
 erDiagram
+    %% Core System
+    COMPANIES ||--o{ BRANCHES : "manages"
+    COMPANIES ||--o{ ROLES : "defines"
+    BRANCHES ||--o{ USERS : "employs"
+    USERS }|--|| ROLES : "assigned"
+
+    %% CRM System
+    COMPANIES ||--o{ CUSTOMERS : "serves"
+    COMPANIES ||--o{ LEADS : "tracks"
+    CUSTOMERS ||--o{ CUSTOMER_NOTES : "has"
+
+    %% Products & Inventory
+    COMPANIES ||--o{ CATEGORIES : "organizes"
+    CATEGORIES ||--o{ SUBCATEGORIES : "refines"
+    CATEGORIES ||--o{ PRODUCTS : "contains"
+    PRODUCTS ||--o{ STOCKS : "stored_in"
+    BRANCHES ||--o{ STOCKS : "holds"
+
+    %% Suppliers & Purchases
+    COMPANIES ||--o{ SUPPLIERS : "deals_with"
+    SUPPLIERS ||--o{ PURCHASE_ORDERS : "receives"
+
+    %% Sales & Financials
+    COMPANIES ||--o{ SALES_ORDERS : "records"
+    SALES_ORDERS ||--o{ INVOICES : "generates"
+    INVOICES ||--o{ PAYMENTS : "paid_by"
+    PAYMENT_METHODS ||--o{ PAYMENTS : "used_in"
+
+    %% Accounting
+    COMPANIES ||--o{ WALLETS : "owns"
+    WALLETS ||--o{ TRANSACTIONS : "logs"
+
+    %% HR System
+    BRANCHES ||--o{ EMPLOYEES : "manages"
+    EMPLOYEES ||--o{ PAYROLLS : "billed_in"
+
+    %% Notifications
+    USERS ||--o{ NOTIFICATIONS : "receives"
+
     COMPANIES {
         bigint id PK
         string name
         string email
         string phone
-        text address
         timestamp created_at
     }
 
@@ -19,155 +57,129 @@ erDiagram
         bigint id PK
         bigint company_id FK
         string name
+        text address
         string location
+    }
+
+    ROLES {
+        bigint id PK
+        bigint company_id FK
+        string name
+        json permissions
+    }
+
+    CUSTOMERS {
+        bigint id PK
+        bigint company_id FK
+        string name
         text address
     }
 
-    USERS {
-        bigint id PK
-        bigint company_id FK
-        bigint branch_id FK
-        string name
-        string email
-        string password
-    }
-
-    CATEGORIES {
+    LEADS {
         bigint id PK
         bigint company_id FK
         string name
-    }
-
-    SUPPLIERS {
-        bigint id PK
-        bigint branch_id FK
-        bigint category_id FK
-        string name
-        string contact_info
+        string source
+        string status
     }
 
     PRODUCTS {
         bigint id PK
+        bigint company_id FK
         bigint category_id FK
-        bigint supplier_id FK
         string name
+        string sku
         decimal price
-        integer stock_quantity
     }
 
-    INVENTORY {
+    STOCKS {
         bigint id PK
         bigint product_id FK
         bigint branch_id FK
         integer quantity
-        string type "In/Out"
     }
 
-    SALES_ORDERS {
+    WALLETS {
         bigint id PK
-        bigint branch_id FK
-        bigint user_id FK
-        date order_date
-        decimal total_amount
-        string status
+        bigint company_id FK
+        string name
+        decimal balance
     }
 
-    SALES_ORDER_ITEMS {
+    TRANSACTIONS {
         bigint id PK
-        bigint sales_order_id FK
-        bigint product_id FK
-        integer quantity
-        decimal unit_price
-    }
-
-    PAYMENTS {
-        bigint id PK
-        bigint sales_order_id FK
+        bigint wallet_id FK
+        string type "Income/Expense"
         decimal amount
-        date payment_date
-        string method
     }
 
-    COMPANIES ||--o{ BRANCHES : "has"
-    COMPANIES ||--o{ CATEGORIES : "defines"
-    BRANCHES ||--o{ USERS : "employs"
-    
-    CATEGORIES ||--o{ PRODUCTS : "contains"
-    SUPPLIERS ||--o{ PRODUCTS : "supplies"
-    
-    PRODUCTS ||--o{ INVENTORY : "tracked_in"
-    BRANCHES ||--o{ INVENTORY : "holds"
-    
-    BRANCHES ||--o{ SALES_ORDERS : "records"
-    USERS ||--o{ SALES_ORDERS : "processes"
-    
-    SALES_ORDERS ||--o{ SALES_ORDER_ITEMS : "contains"
-    PRODUCTS ||--o{ SALES_ORDER_ITEMS : "added_to"
-    
-    SALES_ORDERS ||--o{ PAYMENTS : "billed_by"
+    EMPLOYEES {
+        bigint id PK
+        bigint company_id FK
+        bigint branch_id FK
+        string name
+        string job_title
+        decimal base_salary
+    }
 ```
 
-## 🗝️ ملاحظات على التصميم (Technical Notes):
+---
 
-1.  **Multi-Tenancy**: تبدأ العلاقة من `COMPANIES` التي تملك الفروع والأصناف.
-2.  **Inventory Ledger**: جدول `INVENTORY` يعمل كسجل لكافة الحركات (Stock Movements).
-3.  **Sales Flow**: يتم ربط الفاتورة (`SALES_ORDERS`) بالفرع والمستخدم والمدفوعات.
+## 🚀 Implementation Commands | أوامر التنفيذ (Laravel API-First)
 
-> [!TIP]
-> تم تحديث هذا المخطط ليعكس بنية النظام الحالية والمستهدفة كما هو موضح في الـ [ROADMAP](file:///home/muhammad/Downloads/Laravel%20API-First/ERPSystem/ROADMAP.md).
+استخدم الأوامر التالية لإنشاء النظام بالكامل برمجياً مع الـ Controllers داخل مجلد `Api`:
 
-## 🚀 Implementation Commands | أوامر التنفيذ
-
-يمكنك استخدام الأوامر التالية لإنشاء النماذج (Models) وقواعد البيانات مع الـ Controllers داخل مجلد الـ API:
-
-### 1. الكيانات الأساسية (Foundational Entities)
+### 1️⃣ Core & Business Structure
 ```bash
-# Company
-php artisan make:model Company -mfs
-php artisan make:controller Api/CompanyController --api --model=Company --requests
-
-# Branch
-php artisan make:model Branch -mfs
-php artisan make:controller Api/BranchController --api --model=Branch --requests
+# Company, Branch, Role
+php artisan make:model Company -mfs --api --requests
+php artisan make:model Branch -mfs --api --requests
+php artisan make:model Role -mfs --api --requests
 ```
 
-### 2. التصنيفات والموردين (Catalog & Suppliers)
+### 2️⃣ CRM (Customers & Leads)
 ```bash
-# Category
-php artisan make:model Category -mfs
-php artisan make:controller Api/CategoryController --api --model=Category --requests
-
-# Supplier
-php artisan make:model Supplier -mfs
-php artisan make:controller Api/SupplierController --api --model=Supplier --requests
+# Customer, Lead, Note
+php artisan make:model Customer -mfs --api --requests
+php artisan make:model Lead -mfs --api --requests
+php artisan make:model CustomerNote -mfs --api --requests
 ```
 
-### 3. المنتجات والمخزن (Products & Inventory)
+### 3️⃣ Products & Inventory
 ```bash
-# Product
-php artisan make:model Product -mfs
-php artisan make:controller Api/ProductController --api --model=Product --requests
-
-# Inventory
-php artisan make:model Inventory -mfs
-php artisan make:controller Api/InventoryController --api --model=Inventory --requests
+# Category, Subcategory, Product, Stock
+php artisan make:model Category -mfs --api --requests
+php artisan make:model Subcategory -mfs --api --requests
+php artisan make:model Product -mfs --api --requests
+php artisan make:model Stock -mfs --api --requests
 ```
 
-### 4. المبيعات والمدفوعات (Sales & Payments)
+### 4️⃣ Sales & Purchases
 ```bash
-# Sales Order
-php artisan make:model SalesOrder -mfs
-php artisan make:controller Api/SalesOrderController --api --model=SalesOrder --requests
-
-# Sales Order Item
-php artisan make:model SalesOrderItem -mfs
-php artisan make:controller Api/SalesOrderItemController --api --model=SalesOrderItem --requests
-
-# Payment
-php artisan make:model Payment -mfs
-php artisan make:controller Api/PaymentController --api --model=Payment --requests
+# SalesOrder, PurchaseOrder, Supplier
+php artisan make:model SalesOrder -mfs --api --requests
+php artisan make:model PurchaseOrder -mfs --api --requests
+php artisan make:model Supplier -mfs --api --requests
 ```
 
-> [!NOTE]
-> - علم `-mfs` يقوم بإنشاء (Migration, Factory, Seeder).
-> - الـ Controller يتم إنشاؤه داخل مجلد `Api` مع توفير الـ Form Requests (`Store` & `Update`).
+### 5️⃣ Accounting & Payments
+```bash
+# Wallet, Transaction, Invoice, Payment, PaymentMethod
+php artisan make:model Wallet -mfs --api --requests
+php artisan make:model Transaction -mfs --api --requests
+php artisan make:model Invoice -mfs --api --requests
+php artisan make:model Payment -mfs --api --requests
+php artisan make:model PaymentMethod -mfs --api --requests
+```
+
+### 6️⃣ HR System & Notifications
+```bash
+# Employee, Payroll, Notification
+php artisan make:model Employee -mfs --api --requests
+php artisan make:model Payroll -mfs --api --requests
+php artisan make:model Notification -mfs --api --requests
+```
+
+> [!IMPORTANT]
+> - جميع الـ Controllers سيتم إنشاؤها تلقائياً داخل **`app/Http/Controllers/Api/`** عند تشغيل الأوامر بالترتيب.
+> - الـ Migrations جاهزة لتعريف العلاقات كما في المخطط أعلاه.

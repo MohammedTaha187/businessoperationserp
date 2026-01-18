@@ -573,6 +573,22 @@ php artisan make:model Category -mfs
 ---
 
 ```sql
+-- subcategories table
+- id (bigint, PK)
+- category_id (FK → categories)
+- name (string)
+- description (text, nullable)
+- created_at, updated_at
+```
+
+**Model Command:**
+```bash
+php artisan make:model Subcategory -mfs
+```
+
+---
+
+```sql
 -- products table
 - id (bigint, PK)
 - company_id (FK → companies)
@@ -679,6 +695,22 @@ php artisan make:model PurchaseOrderItem -mfs
 **Model Command:**
 ```bash
 php artisan make:model InventoryLog -mfs
+```
+
+---
+
+```sql
+-- stocks table (Current Stock Levels per Branch)
+- id (bigint, PK)
+- product_id (FK → products)
+- branch_id (FK → branches)
+- quantity (integer)
+- created_at, updated_at
+```
+
+**Model Command:**
+```bash
+php artisan make:model Stock -mfs
 ```
 
 ---
@@ -793,6 +825,56 @@ php artisan make:model Expense -mfs
 **Model Command:**
 ```bash
 php artisan make:model ExpenseCategory -mfs
+```
+
+---
+
+```sql
+-- wallets table
+- id (bigint, PK)
+- company_id (FK → companies)
+- name (string)
+- balance (decimal 15,2, default: 0)
+- created_at, updated_at
+```
+
+**Model Command:**
+```bash
+php artisan make:model Wallet -mfs
+```
+
+---
+
+```sql
+-- transactions table (Accounting Transactions)
+- id (bigint, PK)
+- company_id (FK → companies)
+- wallet_id (FK → wallets)
+- type (enum: income, expense)
+- amount (decimal 15,2)
+- description (text, nullable)
+- transaction_date (date)
+- created_at, updated_at
+```
+
+**Model Command:**
+```bash
+php artisan make:model Transaction -mfs
+```
+
+---
+
+```sql
+-- payment_methods table
+- id (bigint, PK)
+- company_id (FK → companies)
+- name (string)
+- created_at, updated_at
+```
+
+**Model Command:**
+```bash
+php artisan make:model PaymentMethod -mfs
 ```
 
 ---
@@ -1186,7 +1268,34 @@ php artisan make:controller Api/V1/Inventory/PurchaseOrderController --api --mod
 
 ---
 
+#### SubcategoryController
+```bash
+php artisan make:controller Api/V1/Inventory/SubcategoryController --api --model=Subcategory
+```
+
+#### StockController
+```bash
+php artisan make:controller Api/V1/Inventory/StockController --api --model=Stock
+```
+
+---
+
 ### Phase 2.7: Accounting Controllers
+
+#### WalletController
+```bash
+php artisan make:controller Api/V1/Accounting/WalletController --api --model=Wallet
+```
+
+#### TransactionController
+```bash
+php artisan make:controller Api/V1/Accounting/TransactionController --api --model=Transaction
+```
+
+#### PaymentMethodController
+```bash
+php artisan make:controller Api/V1/Accounting/PaymentMethodController --api --model=PaymentMethod
+```
 
 #### InvoiceController
 ```bash
@@ -1314,10 +1423,15 @@ php artisan make:resource Api/V1/Projects/TaskResource
 
 # Inventory Resources
 php artisan make:resource Api/V1/Inventory/ProductResource
+php artisan make:resource Api/V1/Inventory/SubcategoryResource
+php artisan make:resource Api/V1/Inventory/StockResource
 php artisan make:resource Api/V1/Inventory/SupplierResource
 
 # Accounting Resources
 php artisan make:resource Api/V1/Accounting/InvoiceResource
+php artisan make:resource Api/V1/Accounting/WalletResource
+php artisan make:resource Api/V1/Accounting/TransactionResource
+php artisan make:resource Api/V1/Accounting/PaymentMethodResource
 php artisan make:resource Api/V1/Accounting/PaymentResource
 php artisan make:resource Api/V1/Accounting/ExpenseResource
 
@@ -1438,15 +1552,20 @@ Route::prefix('v1')->group(function () {
         // Inventory Module
         Route::prefix('inventory')->group(function () {
             Route::apiResource('categories', CategoryController::class);
+            Route::apiResource('subcategories', SubcategoryController::class);
             Route::apiResource('products', ProductController::class);
+            Route::apiResource('stocks', StockController::class);
             Route::apiResource('suppliers', SupplierController::class);
             Route::apiResource('purchase-orders', PurchaseOrderController::class);
         });
         
         // Accounting Module
         Route::prefix('accounting')->group(function () {
+            Route::apiResource('wallets', WalletController::class);
+            Route::apiResource('transactions', TransactionController::class);
             Route::apiResource('invoices', InvoiceController::class);
             Route::apiResource('payments', PaymentController::class);
+            Route::apiResource('payment-methods', PaymentMethodController::class);
             Route::apiResource('expenses', ExpenseController::class);
         });
         
