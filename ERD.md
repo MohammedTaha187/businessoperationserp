@@ -72,6 +72,14 @@ erDiagram
         string status
     }
 
+    SALES_ORDER_ITEMS {
+        bigint id PK
+        bigint sales_order_id FK
+        bigint product_id FK
+        integer quantity
+        decimal unit_price
+    }
+
     PAYMENTS {
         bigint id PK
         bigint sales_order_id FK
@@ -92,6 +100,9 @@ erDiagram
     
     BRANCHES ||--o{ SALES_ORDERS : "records"
     USERS ||--o{ SALES_ORDERS : "processes"
+    
+    SALES_ORDERS ||--o{ SALES_ORDER_ITEMS : "contains"
+    PRODUCTS ||--o{ SALES_ORDER_ITEMS : "added_to"
     
     SALES_ORDERS ||--o{ PAYMENTS : "billed_by"
 ```
