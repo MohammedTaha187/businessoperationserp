@@ -139,17 +139,16 @@ php artisan make:model User -mfs
 
 **Relationships:**
 - belongsTo: Company, Branch, Department
-- belongsToMany: Roles (via role_user)
-- hasMany: Tasks, Attendances, Leaves, etc.
+- belongsToMany: Roles (via user_roles)
+- hasMany: Notifications, etc.
 
 ---
 
 ```sql
 -- roles table
 - id (bigint, PK)
-- name (string, unique)
-- display_name (string)
-- description (text, nullable)
+- company_id (FK → companies)
+- name (string)
 - created_at, updated_at
 ```
 
@@ -158,43 +157,18 @@ php artisan make:model User -mfs
 php artisan make:model Role -mfs
 ```
 
-**Relationships:**
-- belongsToMany: Users, Permissions
-
 ---
 
 ```sql
--- permissions table
-- id (bigint, PK)
-- name (string, unique)
-- display_name (string)
-- module (string) -- e.g., 'clients', 'projects', 'invoices'
-- created_at, updated_at
+-- user_roles (pivot)
+- user_id (FK → users)
+- role_id (FK → roles)
 ```
 
 **Model Command:**
+**Model Command:**
 ```bash
-php artisan make:model Permission -mfs
-```
-
----
-
-```sql
--- role_user (pivot)
-- id (bigint, PK)
-- user_id (FK → users)
-- role_id (FK → roles)
-- created_at, updated_at
-```
-
----
-
-```sql
--- permission_role (pivot)
-- id (bigint, PK)
-- permission_id (FK → permissions)
-- role_id (FK → roles)
-- created_at, updated_at
+php artisan make:model UserRole -mfs
 ```
 
 ---
@@ -202,47 +176,39 @@ php artisan make:model Permission -mfs
 ### Phase 1.2: CRM Module Tables
 
 ```sql
--- clients table
+-- customers table
 - id (bigint, PK)
 - company_id (FK → companies)
 - name (string)
-- email (string)
 - phone (string)
-- address (text, nullable)
-- tax_number (string, nullable)
-- client_type (enum: individual, company)
-- status_id (FK → client_statuses)
-- assigned_to (FK → users, nullable)
-- notes (text, nullable)
+- email (string)
 - created_at, updated_at, deleted_at
 ```
 
 **Model Command:**
 ```bash
-php artisan make:model Client -mfs
+php artisan make:model Customer -mfs
 ```
 
 **Relationships:**
-- belongsTo: Company, Status (ClientStatus), AssignedUser (User)
-- hasMany: Leads, Opportunities, Contracts, Invoices
+- belongsTo: Company
+- hasMany: Leads, SalesOrders, CustomerNotes
 
 ---
 
 ```sql
--- client_statuses table
+-- customer_notes table
 - id (bigint, PK)
-- name (string)
-- color (string) -- hex color
-- order (integer)
+- customer_id (FK → customers)
+- user_id (FK → users)
+- note (text)
 - created_at, updated_at
 ```
 
 **Model Command:**
 ```bash
-php artisan make:model ClientStatus -mfs
+php artisan make:model CustomerNote -mfs
 ```
-
-**Default Statuses:** New, Contacted, Qualified, Proposal, Negotiation, Won, Lost
 
 ---
 
@@ -250,35 +216,15 @@ php artisan make:model ClientStatus -mfs
 -- leads table
 - id (bigint, PK)
 - company_id (FK → companies)
-- client_id (FK → clients, nullable)
-- title (string)
-- source (enum: website, referral, cold_call, social_media, other)
-- value (decimal 15,2, nullable)
-- status_id (FK → lead_statuses)
-- assigned_to (FK → users, nullable)
-- notes (text, nullable)
+- name (string)
+- source (string)
+- status (string)
 - created_at, updated_at, deleted_at
 ```
 
 **Model Command:**
 ```bash
 php artisan make:model Lead -mfs
-```
-
----
-
-```sql
--- lead_statuses table
-- id (bigint, PK)
-- name (string)
-- color (string)
-- order (integer)
-- created_at, updated_at
-```
-
-**Model Command:**
-```bash
-php artisan make:model LeadStatus -mfs
 ```
 
 ---
@@ -346,210 +292,13 @@ php artisan make:model FollowUp -mfs
 
 ---
 
-### Phase 1.3: Sales & Contracts Module
-
-```sql
--- quotations table
-- id (bigint, PK)
-- company_id (FK → companies)
-- client_id (FK → clients)
-- quotation_number (string, unique)
-- subject (string)
-- quotation_date (date)
-- valid_until (date)
-- subtotal (decimal 15,2)
-- tax_amount (decimal 15,2)
-- discount_amount (decimal 15,2)
-- total (decimal 15,2)
-- status (enum: draft, sent, accepted, rejected, expired)
-- notes (text, nullable)
-- terms_conditions (text, nullable)
-- created_by (FK → users)
-- created_at, updated_at, deleted_at
-```
-
-**Model Command:**
-```bash
-php artisan make:model Quotation -mfs
-```
+### Phase 1.3: Sales Module (Merged into SalesOrders)
+<!-- Sales logic moved to Phase 1.2 in ERD structure -->
 
 ---
 
-```sql
--- quotation_items table
-- id (bigint, PK)
-- quotation_id (FK → quotations)
-- product_id (FK → products, nullable)
-- description (text)
-- quantity (decimal 10,2)
-- unit_price (decimal 15,2)
-- tax_rate (decimal 5,2)
-- discount_rate (decimal 5,2)
-- total (decimal 15,2)
-- created_at, updated_at
-```
-
-**Model Command:**
-```bash
-php artisan make:model QuotationItem -mfs
-```
-
----
-
-```sql
--- contracts table
-- id (bigint, PK)
-- company_id (FK → companies)
-- client_id (FK → clients)
-- quotation_id (FK → quotations, nullable)
-- contract_number (string, unique)
-- subject (string)
-- contract_date (date)
-- start_date (date)
-- end_date (date, nullable)
-- subtotal (decimal 15,2)
-- tax_amount (decimal 15,2)
-- discount_amount (decimal 15,2)
-- total (decimal 15,2)
-- status (enum: draft, active, completed, cancelled)
-- notes (text, nullable)
-- terms_conditions (text, nullable)
-- created_by (FK → users)
-- created_at, updated_at, deleted_at
-```
-
-**Model Command:**
-```bash
-php artisan make:model Contract -mfs
-```
-
----
-
-```sql
--- contract_items table
-- id (bigint, PK)
-- contract_id (FK → contracts)
-- product_id (FK → products, nullable)
-- description (text)
-- quantity (decimal 10,2)
-- unit_price (decimal 15,2)
-- tax_rate (decimal 5,2)
-- discount_rate (decimal 5,2)
-- total (decimal 15,2)
-- created_at, updated_at
-```
-
-**Model Command:**
-```bash
-php artisan make:model ContractItem -mfs
-```
-
----
-
-### Phase 1.4: Projects Module
-
-```sql
--- projects table
-- id (bigint, PK)
-- company_id (FK → companies)
-- client_id (FK → clients)
-- contract_id (FK → contracts, nullable)
-- name (string)
-- description (text, nullable)
-- start_date (date)
-- end_date (date, nullable)
-- budget (decimal 15,2, nullable)
-- status (enum: planning, in_progress, on_hold, completed, cancelled)
-- progress (integer, default: 0) -- 0-100%
-- priority (enum: low, medium, high, urgent)
-- manager_id (FK → users, nullable)
-- created_at, updated_at, deleted_at
-```
-
-**Model Command:**
-```bash
-php artisan make:model Project -mfs
-```
-
----
-
-```sql
--- project_phases table
-- id (bigint, PK)
-- project_id (FK → projects)
-- name (string)
-- description (text, nullable)
-- start_date (date)
-- end_date (date, nullable)
-- status (enum: pending, in_progress, completed)
-- progress (integer, default: 0)
-- order (integer)
-- created_at, updated_at, deleted_at
-```
-
-**Model Command:**
-```bash
-php artisan make:model ProjectPhase -mfs
-```
-
----
-
-```sql
--- tasks table
-- id (bigint, PK)
-- company_id (FK → companies)
-- project_id (FK → projects)
-- phase_id (FK → project_phases, nullable)
-- title (string)
-- description (text, nullable)
-- start_date (date, nullable)
-- due_date (date, nullable)
-- status (enum: todo, in_progress, review, completed, cancelled)
-- priority (enum: low, medium, high, urgent)
-- progress (integer, default: 0)
-- estimated_hours (decimal 8,2, nullable)
-- actual_hours (decimal 8,2, nullable)
-- created_by (FK → users)
-- created_at, updated_at, deleted_at
-```
-
-**Model Command:**
-```bash
-php artisan make:model Task -mfs
-```
-
----
-
-```sql
--- task_assignments table
-- id (bigint, PK)
-- task_id (FK → tasks)
-- user_id (FK → users)
-- assigned_at (timestamp)
-- assigned_by (FK → users)
-- created_at, updated_at
-```
-
-**Model Command:**
-```bash
-php artisan make:model TaskAssignment -mfs
-```
-
----
-
-```sql
--- task_comments table
-- id (bigint, PK)
-- task_id (FK → tasks)
-- user_id (FK → users)
-- comment (text)
-- created_at, updated_at, deleted_at
-```
-
-**Model Command:**
-```bash
-php artisan make:model TaskComment -mfs
-```
+### Phase 1.4: Projects Module (Removed per ERD)
+<!-- Project management removed as per simplified ERD -->
 
 ---
 
@@ -609,92 +358,51 @@ php artisan make:model Subcategory -mfs
 
 **Model Command:**
 ```bash
-php artisan make:model Product -mfs
-```
-
----
-
 ```sql
--- suppliers table
+-- categories table
 - id (bigint, PK)
 - company_id (FK → companies)
 - name (string)
-- email (string, nullable)
-- phone (string)
-- address (text, nullable)
-- tax_number (string, nullable)
-- status (enum: active, inactive)
-- notes (text, nullable)
 - created_at, updated_at, deleted_at
 ```
 
 **Model Command:**
 ```bash
-php artisan make:model Supplier -mfs
+php artisan make:model Category -mfs
 ```
 
 ---
 
 ```sql
--- purchase_orders table
+-- subcategories table
+- id (bigint, PK)
+- category_id (FK → categories)
+- name (string)
+- created_at, updated_at
+```
+
+**Model Command:**
+```bash
+php artisan make:model Subcategory -mfs
+```
+
+---
+
+```sql
+-- products table
 - id (bigint, PK)
 - company_id (FK → companies)
-- supplier_id (FK → suppliers)
-- order_number (string, unique)
-- order_date (date)
-- expected_delivery_date (date, nullable)
-- subtotal (decimal 15,2)
-- tax_amount (decimal 15,2)
-- total (decimal 15,2)
-- status (enum: draft, sent, received, cancelled)
-- notes (text, nullable)
-- created_by (FK → users)
+- subcategory_id (FK → subcategories)
+- name (string)
+- sku (string, unique)
+- cost_price (decimal 15,2)
+- selling_price (decimal 15,2)
 - created_at, updated_at, deleted_at
 ```
 
 **Model Command:**
 ```bash
-php artisan make:model PurchaseOrder -mfs
-```
-
----
-
-```sql
--- purchase_order_items table
-- id (bigint, PK)
-- purchase_order_id (FK → purchase_orders)
-- product_id (FK → products)
-- quantity (decimal 10,2)
-- unit_price (decimal 15,2)
-- tax_rate (decimal 5,2)
-- total (decimal 15,2)
-- created_at, updated_at
-```
-
-**Model Command:**
-```bash
-php artisan make:model PurchaseOrderItem -mfs
-```
-
----
-
-```sql
--- inventory_logs table
-- id (bigint, PK)
-- company_id (FK → companies)
-- product_id (FK → products)
-- type (enum: in, out, adjustment)
-- quantity (decimal 10,2)
-- reference_type (string, nullable) -- polymorphic
-- reference_id (bigint, nullable) -- polymorphic
-- notes (text, nullable)
-- created_by (FK → users)
-- created_at, updated_at
-```
-
-**Model Command:**
-```bash
-php artisan make:model InventoryLog -mfs
+php artisan make:model Product -mfs
 ```
 
 ---
@@ -715,26 +423,123 @@ php artisan make:model Stock -mfs
 
 ---
 
+```sql
+-- inventory_transactions table
+- id (bigint, PK)
+- product_id (FK → products)
+- branch_id (FK → branches)
+- type (string) -- e.g., 'in', 'out'
+- quantity (integer)
+- reference_type (string) -- e.g., 'SalesOrder', 'PurchaseOrder'
+- reference_id (bigint)
+- created_at, updated_at
+```
+
+**Model Command:**
+```bash
+php artisan make:model InventoryTransaction -mfs
+```
+
+---
+
+```sql
+-- suppliers table
+- id (bigint, PK)
+- company_id (FK → companies)
+- name (string)
+- phone (string)
+- created_at, updated_at, deleted_at
+```
+
+**Model Command:**
+```bash
+php artisan make:model Supplier -mfs
+```
+
+---
+
+```sql
+-- purchase_orders table
+- id (bigint, PK)
+- supplier_id (FK → suppliers)
+- company_id (FK → companies)
+- status (string)
+- total_amount (decimal 15,2)
+- created_at, updated_at, deleted_at
+```
+
+**Model Command:**
+```bash
+php artisan make:model PurchaseOrder -mfs
+```
+
+---
+
+```sql
+-- purchase_order_items table
+- id (bigint, PK)
+- purchase_order_id (FK → purchase_orders)
+- product_id (FK → products)
+- quantity (integer)
+- unit_price (decimal 15,2)
+- created_at, updated_at
+```
+
+**Model Command:**
+```bash
+php artisan make:model PurchaseOrderItem -mfs
+```
+
+---
+
+```sql
+-- sales_orders table
+- id (bigint, PK)
+- company_id (FK → companies)
+- customer_id (FK → customers)
+- branch_id (FK → branches)
+- status (string)
+- subtotal (decimal 15,2)
+- tax (decimal 15,2)
+- discount (decimal 15,2)
+- total (decimal 15,2)
+- created_at, updated_at, deleted_at
+```
+
+**Model Command:**
+```bash
+php artisan make:model SalesOrder -mfs
+```
+
+---
+
+```sql
+-- sales_order_items table
+- id (bigint, PK)
+- sales_order_id (FK → sales_orders)
+- product_id (FK → products)
+- quantity (integer)
+- unit_price (decimal 15,2)
+- total_price (decimal 15,2)
+- created_at, updated_at
+```
+
+**Model Command:**
+```bash
+php artisan make:model SalesOrderItem -mfs
+```
+
+---
+
 ### Phase 1.6: Accounting Module
 
 ```sql
 -- invoices table
 - id (bigint, PK)
-- company_id (FK → companies)
-- client_id (FK → clients)
-- contract_id (FK → contracts, nullable)
-- project_id (FK → projects, nullable)
-- invoice_number (string, unique)
+- sales_order_id (FK → sales_orders)
 - invoice_date (date)
-- due_date (date)
-- subtotal (decimal 15,2)
-- tax_amount (decimal 15,2)
-- discount_amount (decimal 15,2)
-- total (decimal 15,2)
-- paid_amount (decimal 15,2, default: 0)
-- status (enum: draft, sent, partially_paid, paid, overdue, cancelled)
-- notes (text, nullable)
-- created_by (FK → users)
+- total_amount (decimal 15,2)
+- status (string)
 - created_at, updated_at, deleted_at
 ```
 
@@ -746,22 +551,14 @@ php artisan make:model Invoice -mfs
 ---
 
 ```sql
--- invoice_items table
+-- payment_methods table
 - id (bigint, PK)
-- invoice_id (FK → invoices)
-- product_id (FK → products, nullable)
-- description (text)
-- quantity (decimal 10,2)
-- unit_price (decimal 15,2)
-- tax_rate (decimal 5,2)
-- discount_rate (decimal 5,2)
-- total (decimal 15,2)
-- created_at, updated_at
+- name (string)
 ```
 
 **Model Command:**
 ```bash
-php artisan make:model InvoiceItem -mfs
+php artisan make:model PaymentMethod -mfs
 ```
 
 ---
@@ -769,15 +566,10 @@ php artisan make:model InvoiceItem -mfs
 ```sql
 -- payments table
 - id (bigint, PK)
-- company_id (FK → companies)
-- invoice_id (FK → invoices, nullable)
-- payment_number (string, unique)
-- payment_date (date)
+- invoice_id (FK → invoices)
+- payment_method_id (FK → payment_methods)
 - amount (decimal 15,2)
-- payment_method (enum: cash, bank_transfer, cheque, credit_card, other)
-- reference_number (string, nullable)
-- notes (text, nullable)
-- created_by (FK → users)
+- payment_date (date)
 - created_at, updated_at, deleted_at
 ```
 
@@ -788,46 +580,7 @@ php artisan make:model Payment -mfs
 
 ---
 
-```sql
--- expenses table
-- id (bigint, PK)
-- company_id (FK → companies)
-- category_id (FK → expense_categories)
-- project_id (FK → projects, nullable)
-- title (string)
-- description (text, nullable)
-- amount (decimal 15,2)
-- expense_date (date)
-- payment_method (enum: cash, bank_transfer, cheque, credit_card, other)
-- receipt (string, nullable)
-- status (enum: pending, approved, rejected, paid)
-- created_by (FK → users)
-- approved_by (FK → users, nullable)
-- created_at, updated_at, deleted_at
-```
-
-**Model Command:**
-```bash
-php artisan make:model Expense -mfs
-```
-
----
-
-```sql
--- expense_categories table
-- id (bigint, PK)
-- company_id (FK → companies)
-- name (string)
-- description (text, nullable)
-- created_at, updated_at, deleted_at
-```
-
-**Model Command:**
-```bash
-php artisan make:model ExpenseCategory -mfs
-```
-
----
+### Phase 1.6: Accounting Module
 
 ```sql
 -- wallets table
@@ -848,12 +601,11 @@ php artisan make:model Wallet -mfs
 ```sql
 -- transactions table (Accounting Transactions)
 - id (bigint, PK)
-- company_id (FK → companies)
 - wallet_id (FK → wallets)
-- type (enum: income, expense)
+- type (string) -- e.g., 'income', 'expense'
 - amount (decimal 15,2)
-- description (text, nullable)
-- transaction_date (date)
+- reference_type (string)
+- reference_id (bigint)
 - created_at, updated_at
 ```
 
@@ -864,36 +616,15 @@ php artisan make:model Transaction -mfs
 
 ---
 
-```sql
--- payment_methods table
-- id (bigint, PK)
-- company_id (FK → companies)
-- name (string)
-- created_at, updated_at
-```
-
-**Model Command:**
-```bash
-php artisan make:model PaymentMethod -mfs
-```
-
----
-
 ### Phase 1.7: HR Module
 
 ```sql
--- employees table (extends users)
+-- employees table
 - id (bigint, PK)
 - user_id (FK → users, unique)
-- employee_number (string, unique)
-- job_title_id (FK → job_titles)
-- hire_date (date)
-- employment_type (enum: full_time, part_time, contract, intern)
+- branch_id (FK → branches)
+- job_title (string)
 - salary (decimal 15,2)
-- salary_type (enum: monthly, hourly, daily)
-- bank_account (string, nullable)
-- emergency_contact_name (string, nullable)
-- emergency_contact_phone (string, nullable)
 - created_at, updated_at, deleted_at
 ```
 
@@ -905,98 +636,11 @@ php artisan make:model Employee -mfs
 ---
 
 ```sql
--- job_titles table
-- id (bigint, PK)
-- company_id (FK → companies)
-- title (string)
-- description (text, nullable)
-- created_at, updated_at, deleted_at
-```
-
-**Model Command:**
-```bash
-php artisan make:model JobTitle -mfs
-```
-
----
-
-```sql
--- attendances table
-- id (bigint, PK)
-- company_id (FK → companies)
-- user_id (FK → users)
-- date (date)
-- check_in (time)
-- check_out (time, nullable)
-- work_hours (decimal 5,2, nullable)
-- status (enum: present, late, absent, half_day)
-- notes (text, nullable)
-- created_at, updated_at
-```
-
-**Model Command:**
-```bash
-php artisan make:model Attendance -mfs
-```
-
----
-
-```sql
--- leaves table
-- id (bigint, PK)
-- company_id (FK → companies)
-- user_id (FK → users)
-- leave_type_id (FK → leave_types)
-- start_date (date)
-- end_date (date)
-- days (integer)
-- reason (text)
-- status (enum: pending, approved, rejected)
-- approved_by (FK → users, nullable)
-- approved_at (timestamp, nullable)
-- notes (text, nullable)
-- created_at, updated_at, deleted_at
-```
-
-**Model Command:**
-```bash
-php artisan make:model Leave -mfs
-```
-
----
-
-```sql
--- leave_types table
-- id (bigint, PK)
-- company_id (FK → companies)
-- name (string)
-- days_per_year (integer)
-- paid (boolean, default: true)
-- created_at, updated_at, deleted_at
-```
-
-**Model Command:**
-```bash
-php artisan make:model LeaveType -mfs
-```
-
----
-
-```sql
 -- payrolls table
 - id (bigint, PK)
-- company_id (FK → companies)
-- user_id (FK → users)
-- month (integer)
-- year (integer)
-- basic_salary (decimal 15,2)
-- allowances (decimal 15,2, default: 0)
-- deductions (decimal 15,2, default: 0)
+- employee_id (FK → employees)
+- month (string)
 - net_salary (decimal 15,2)
-- status (enum: draft, processed, paid)
-- payment_date (date, nullable)
-- notes (text, nullable)
-- created_by (FK → users)
 - created_at, updated_at, deleted_at
 ```
 
@@ -1007,56 +651,21 @@ php artisan make:model Payroll -mfs
 
 ---
 
-### Phase 1.8: Notifications & System Tables
+### Phase 1.8: Notifications Module
 
 ```sql
--- notifications table (Laravel default)
-- id (uuid, PK)
-- type (string)
-- notifiable_type (string)
-- notifiable_id (bigint)
-- data (text)
-- read_at (timestamp, nullable)
-- created_at, updated_at
-```
-
----
-
-```sql
--- activity_logs table
+-- notifications table
 - id (bigint, PK)
-- company_id (FK → companies)
-- user_id (FK → users, nullable)
-- subject_type (string)
-- subject_id (bigint, nullable)
-- action (string) -- created, updated, deleted, etc.
-- description (text, nullable)
-- properties (json, nullable)
-- ip_address (string, nullable)
-- user_agent (string, nullable)
+- user_id (FK → users)
+- title (string)
+- body (text)
+- is_read (boolean, default: false)
 - created_at, updated_at
 ```
 
 **Model Command:**
 ```bash
-php artisan make:model ActivityLog -mfs
-```
-
----
-
-```sql
--- settings table
-- id (bigint, PK)
-- company_id (FK → companies, nullable)
-- key (string)
-- value (text, nullable)
-- type (enum: string, integer, boolean, json)
-- created_at, updated_at
-```
-
-**Model Command:**
-```bash
-php artisan make:model Setting -mfs
+php artisan make:model Notification -mfs
 ```
 
 ---
@@ -1093,274 +702,148 @@ php artisan make:controller Api/V1/Auth/PasswordController
 
 #### CompanyController
 ```bash
-php artisan make:controller Api/V1/CompanyController --api --model=Company
+php artisan make:controller Api/CompanyController --api --model=Company --requests
 ```
-
-**Methods:**
-- `index()` - قائمة الشركات
-- `store()` - إضافة شركة
-- `show()` - عرض شركة
-- `update()` - تحديث شركة
-- `destroy()` - حذف شركة
 
 #### BranchController
 ```bash
-php artisan make:controller Api/V1/BranchController --api --model=Branch
-```
-
-#### DepartmentController
-```bash
-php artisan make:controller Api/V1/DepartmentController --api --model=Department
+php artisan make:controller Api/BranchController --api --model=Branch --requests
 ```
 
 #### UserController
 ```bash
-php artisan make:controller Api/V1/UserController --api --model=User
+php artisan make:controller Api/UserController --api --model=User --requests
 ```
-
-**Additional Methods:**
-- `assignRole()` - تعيين دور للمستخدم
-- `removeRole()` - إزالة دور من المستخدم
-- `updateStatus()` - تحديث حالة المستخدم
 
 #### RoleController
 ```bash
-php artisan make:controller Api/V1/RoleController --api --model=Role
+php artisan make:controller Api/RoleController --api --model=Role --requests
 ```
-
-**Additional Methods:**
-- `assignPermissions()` - تعيين صلاحيات للدور
-- `syncPermissions()` - مزامنة صلاحيات الدور
 
 ---
 
 ### Phase 2.3: CRM Controllers
 
-#### ClientController
+#### CustomerController
 ```bash
-php artisan make:controller Api/V1/CRM/ClientController --api --model=Client
+php artisan make:controller Api/CustomerController --api --model=Customer --requests
 ```
-
-**Additional Methods:**
-- `assignUser()` - تعيين مستخدم للعميل
-- `updateStatus()` - تحديث حالة العميل
-- `getContracts()` - عقود العميل
-- `getInvoices()` - فواتير العميل
 
 #### LeadController
 ```bash
-php artisan make:controller Api/V1/CRM/LeadController --api --model=Lead
+php artisan make:controller Api/LeadController --api --model=Lead --requests
 ```
 
-**Additional Methods:**
-- `convertToClient()` - تحويل Lead إلى عميل
-- `updateStatus()` - تحديث حالة Lead
-
-#### OpportunityController
+#### CustomerNoteController
 ```bash
-php artisan make:controller Api/V1/CRM/OpportunityController --api --model=Opportunity
+php artisan make:controller Api/CustomerNoteController --api --model=CustomerNote --requests
 ```
-
-**Additional Methods:**
-- `updateProbability()` - تحديث احتمالية النجاح
-- `convertToContract()` - تحويل إلى عقد
-
-#### FollowUpController
-```bash
-php artisan make:controller Api/V1/CRM/FollowUpController --api --model=FollowUp
-```
-
-**Additional Methods:**
-- `markAsCompleted()` - تحديد كمكتمل
-- `getUpcoming()` - المتابعات القادمة
 
 ---
 
-### Phase 2.4: Sales Controllers
-
-#### QuotationController
-```bash
-php artisan make:controller Api/V1/Sales/QuotationController --api --model=Quotation
-```
-
-**Additional Methods:**
-- `sendToClient()` - إرسال للعميل
-- `accept()` - قبول العرض
-- `reject()` - رفض العرض
-- `convertToContract()` - تحويل لعقد
-- `generatePDF()` - توليد PDF
-
-#### ContractController
-```bash
-php artisan make:controller Api/V1/Sales/ContractController --api --model=Contract
-```
-
-**Additional Methods:**
-- `activate()` - تفعيل العقد
-- `complete()` - إنهاء العقد
-- `cancel()` - إلغاء العقد
-- `generatePDF()` - توليد PDF
-
----
-
-### Phase 2.5: Projects Controllers
-
-#### ProjectController
-```bash
-php artisan make:controller Api/V1/Projects/ProjectController --api --model=Project
-```
-
-**Additional Methods:**
-- `updateProgress()` - تحديث التقدم
-- `updateStatus()` - تحديث الحالة
-- `assignManager()` - تعيين مدير
-- `getStatistics()` - إحصائيات المشروع
-
-#### ProjectPhaseController
-```bash
-php artisan make:controller Api/V1/Projects/ProjectPhaseController --api --model=ProjectPhase
-```
-
-#### TaskController
-```bash
-php artisan make:controller Api/V1/Projects/TaskController --api --model=Task
-```
-
-**Additional Methods:**
-- `assignUsers()` - تعيين مستخدمين
-- `updateProgress()` - تحديث التقدم
-- `updateStatus()` - تحديث الحالة
-- `addComment()` - إضافة تعليق
-
----
-
-### Phase 2.6: Inventory Controllers
+### Phase 2.4: Products & Inventory Controllers
 
 #### CategoryController
 ```bash
-php artisan make:controller Api/V1/Inventory/CategoryController --api --model=Category
+php artisan make:controller Api/CategoryController --api --model=Category --requests
+```
+
+#### SubcategoryController
+```bash
+php artisan make:controller Api/SubcategoryController --api --model=Subcategory --requests
 ```
 
 #### ProductController
 ```bash
-php artisan make:controller Api/V1/Inventory/ProductController --api --model=Product
-```
-
-**Additional Methods:**
-- `updateStock()` - تحديث المخزون
-- `getLowStock()` - المنتجات منخفضة المخزون
-- `getStockHistory()` - تاريخ المخزون
-
-#### SupplierController
-```bash
-php artisan make:controller Api/V1/Inventory/SupplierController --api --model=Supplier
-```
-
-#### PurchaseOrderController
-```bash
-php artisan make:controller Api/V1/Inventory/PurchaseOrderController --api --model=PurchaseOrder
-```
-
-**Additional Methods:**
-- `send()` - إرسال الطلب
-- `receive()` - استلام الطلب
-- `cancel()` - إلغاء الطلب
-
----
-
-#### SubcategoryController
-```bash
-php artisan make:controller Api/V1/Inventory/SubcategoryController --api --model=Subcategory
+php artisan make:controller Api/ProductController --api --model=Product --requests
 ```
 
 #### StockController
 ```bash
-php artisan make:controller Api/V1/Inventory/StockController --api --model=Stock
+php artisan make:controller Api/StockController --api --model=Stock --requests
+```
+
+#### InventoryTransactionController
+```bash
+php artisan make:controller Api/InventoryTransactionController --api --model=InventoryTransaction --requests
 ```
 
 ---
 
-### Phase 2.7: Accounting Controllers
+### Phase 2.5: Sales & Purchases Controllers
+
+#### SalesOrderController
+```bash
+php artisan make:controller Api/SalesOrderController --api --model=SalesOrder --requests
+```
+
+#### SalesOrderItemController
+```bash
+php artisan make:controller Api/SalesOrderItemController --api --model=SalesOrderItem --requests
+```
+
+#### SupplierController
+```bash
+php artisan make:controller Api/SupplierController --api --model=Supplier --requests
+```
+
+#### PurchaseOrderController
+```bash
+php artisan make:controller Api/PurchaseOrderController --api --model=PurchaseOrder --requests
+```
+
+#### PurchaseOrderItemController
+```bash
+php artisan make:controller Api/PurchaseOrderItemController --api --model=PurchaseOrderItem --requests
+```
+
+---
+
+### Phase 2.6: Accounting & Payments Controllers
 
 #### WalletController
 ```bash
-php artisan make:controller Api/V1/Accounting/WalletController --api --model=Wallet
+php artisan make:controller Api/WalletController --api --model=Wallet --requests
 ```
 
 #### TransactionController
 ```bash
-php artisan make:controller Api/V1/Accounting/TransactionController --api --model=Transaction
-```
-
-#### PaymentMethodController
-```bash
-php artisan make:controller Api/V1/Accounting/PaymentMethodController --api --model=PaymentMethod
+php artisan make:controller Api/TransactionController --api --model=Transaction --requests
 ```
 
 #### InvoiceController
 ```bash
-php artisan make:controller Api/V1/Accounting/InvoiceController --api --model=Invoice
+php artisan make:controller Api/InvoiceController --api --model=Invoice --requests
 ```
 
-**Additional Methods:**
-- `send()` - إرسال الفاتورة
-- `recordPayment()` - تسجيل دفعة
-- `cancel()` - إلغاء الفاتورة
-- `generatePDF()` - توليد PDF
+#### PaymentMethodController
+```bash
+php artisan make:controller Api/PaymentMethodController --api --model=PaymentMethod --requests
+```
 
 #### PaymentController
 ```bash
-php artisan make:controller Api/V1/Accounting/PaymentController --api --model=Payment
+php artisan make:controller Api/PaymentController --api --model=Payment --requests
 ```
-
-#### ExpenseController
-```bash
-php artisan make:controller Api/V1/Accounting/ExpenseController --api --model=Expense
-```
-
-**Additional Methods:**
-- `approve()` - الموافقة
-- `reject()` - الرفض
-- `markAsPaid()` - تحديد كمدفوع
 
 ---
 
-### Phase 2.8: HR Controllers
+### Phase 2.7: HR & Notifications Controllers
 
 #### EmployeeController
 ```bash
-php artisan make:controller Api/V1/HR/EmployeeController --api --model=Employee
+php artisan make:controller Api/EmployeeController --api --model=Employee --requests
 ```
-
-#### AttendanceController
-```bash
-php artisan make:controller Api/V1/HR/AttendanceController --api --model=Attendance
-```
-
-**Additional Methods:**
-- `checkIn()` - تسجيل حضور
-- `checkOut()` - تسجيل انصراف
-- `getMonthlyReport()` - تقرير شهري
-
-#### LeaveController
-```bash
-php artisan make:controller Api/V1/HR/LeaveController --api --model=Leave
-```
-
-**Additional Methods:**
-- `approve()` - الموافقة
-- `reject()` - الرفض
-- `getBalance()` - رصيد الإجازات
 
 #### PayrollController
 ```bash
-php artisan make:controller Api/V1/HR/PayrollController --api --model=Payroll
+php artisan make:controller Api/PayrollController --api --model=Payroll --requests
 ```
 
-**Additional Methods:**
-- `process()` - معالجة الراتب
-- `markAsPaid()` - تحديد كمدفوع
-- `generatePayslip()` - توليد قسيمة الراتب
+#### NotificationController
+```bash
+php artisan make:controller Api/NotificationController --api --model=Notification --requests
+```
 
 ---
 
@@ -1400,95 +883,88 @@ php artisan make:controller Api/V1/ReportController
 
 ```bash
 # Core Resources
-php artisan make:resource Api/V1/CompanyResource
-php artisan make:resource Api/V1/BranchResource
-php artisan make:resource Api/V1/DepartmentResource
-php artisan make:resource Api/V1/UserResource
-php artisan make:resource Api/V1/RoleResource
-php artisan make:resource Api/V1/PermissionResource
+php artisan make:resource Api/CompanyResource
+php artisan make:resource Api/BranchResource
+php artisan make:resource Api/UserResource
+php artisan make:resource Api/RoleResource
 
 # CRM Resources
-php artisan make:resource Api/V1/CRM/ClientResource
-php artisan make:resource Api/V1/CRM/LeadResource
-php artisan make:resource Api/V1/CRM/OpportunityResource
-php artisan make:resource Api/V1/CRM/FollowUpResource
-
-# Sales Resources
-php artisan make:resource Api/V1/Sales/QuotationResource
-php artisan make:resource Api/V1/Sales/ContractResource
-
-# Projects Resources
-php artisan make:resource Api/V1/Projects/ProjectResource
-php artisan make:resource Api/V1/Projects/TaskResource
+php artisan make:resource Api/CustomerResource
+php artisan make:resource Api/LeadResource
+php artisan make:resource Api/CustomerNoteResource
 
 # Inventory Resources
-php artisan make:resource Api/V1/Inventory/ProductResource
-php artisan make:resource Api/V1/Inventory/SubcategoryResource
-php artisan make:resource Api/V1/Inventory/StockResource
-php artisan make:resource Api/V1/Inventory/SupplierResource
+php artisan make:resource Api/ProductResource
+php artisan make:resource Api/CategoryResource
+php artisan make:resource Api/SubcategoryResource
+php artisan make:resource Api/StockResource
+php artisan make:resource Api/InventoryTransactionResource
+php artisan make:resource Api/SupplierResource
+
+# Sales & Purchases Resources
+php artisan make:resource Api/SalesOrderResource
+php artisan make:resource Api/SalesOrderItemResource
+php artisan make:resource Api/PurchaseOrderResource
+php artisan make:resource Api/PurchaseOrderItemResource
 
 # Accounting Resources
-php artisan make:resource Api/V1/Accounting/InvoiceResource
-php artisan make:resource Api/V1/Accounting/WalletResource
-php artisan make:resource Api/V1/Accounting/TransactionResource
-php artisan make:resource Api/V1/Accounting/PaymentMethodResource
-php artisan make:resource Api/V1/Accounting/PaymentResource
-php artisan make:resource Api/V1/Accounting/ExpenseResource
+php artisan make:resource Api/WalletResource
+php artisan make:resource Api/TransactionResource
+php artisan make:resource Api/InvoiceResource
+php artisan make:resource Api/PaymentMethodResource
+php artisan make:resource Api/PaymentResource
 
 # HR Resources
-php artisan make:resource Api/V1/HR/EmployeeResource
-php artisan make:resource Api/V1/HR/AttendanceResource
-php artisan make:resource Api/V1/HR/LeaveResource
-php artisan make:resource Api/V1/HR/PayrollResource
+php artisan make:resource Api/EmployeeResource
+php artisan make:resource Api/PayrollResource
+php artisan make:resource Api/NotificationResource
 ```
 
 ---
 
-### Phase 3.2: Form Requests (Validation)
+### Phase 3.2: API Routes Structure
 
-#### Create Form Requests for All Controllers
+**File:** `routes/api.php`
 
-```bash
-# Auth Requests
-php artisan make:request Api/V1/Auth/LoginRequest
-php artisan make:request Api/V1/Auth/RegisterRequest
-php artisan make:request Api/V1/Auth/ChangePasswordRequest
+```php
+Route::middleware(['auth:sanctum'])->group(function () {
+    // Core
+    Route::apiResource('companies', CompanyController::class);
+    Route::apiResource('branches', BranchController::class);
+    Route::apiResource('users', UserController::class);
+    Route::apiResource('roles', RoleController::class);
 
-# Company Requests
-php artisan make:request Api/V1/StoreCompanyRequest
-php artisan make:request Api/V1/UpdateCompanyRequest
+    // CRM
+    Route::apiResource('customers', CustomerController::class);
+    Route::apiResource('leads', LeadController::class);
+    Route::apiResource('customer-notes', CustomerNoteController::class);
 
-# CRM Requests
-php artisan make:request Api/V1/CRM/StoreClientRequest
-php artisan make:request Api/V1/CRM/UpdateClientRequest
-php artisan make:request Api/V1/CRM/StoreLeadRequest
-php artisan make:request Api/V1/CRM/UpdateLeadRequest
+    // Inventory
+    Route::apiResource('categories', CategoryController::class);
+    Route::apiResource('subcategories', SubcategoryController::class);
+    Route::apiResource('products', ProductController::class);
+    Route::apiResource('stocks', StockController::class);
+    Route::apiResource('inventory-transactions', InventoryTransactionController::class);
+    Route::apiResource('suppliers', SupplierController::class);
 
-# Sales Requests
-php artisan make:request Api/V1/Sales/StoreQuotationRequest
-php artisan make:request Api/V1/Sales/UpdateQuotationRequest
-php artisan make:request Api/V1/Sales/StoreContractRequest
-php artisan make:request Api/V1/Sales/UpdateContractRequest
+    // Sales & Purchases
+    Route::apiResource('sales-orders', SalesOrderController::class);
+    Route::apiResource('sales-order-items', SalesOrderItemController::class);
+    Route::apiResource('purchase-orders', PurchaseOrderController::class);
+    Route::apiResource('purchase-order-items', PurchaseOrderItemController::class);
 
-# Projects Requests
-php artisan make:request Api/V1/Projects/StoreProjectRequest
-php artisan make:request Api/V1/Projects/UpdateProjectRequest
-php artisan make:request Api/V1/Projects/StoreTaskRequest
-php artisan make:request Api/V1/Projects/UpdateTaskRequest
+    // Accounting
+    Route::apiResource('wallets', WalletController::class);
+    Route::apiResource('transactions', TransactionController::class);
+    Route::apiResource('invoices', InvoiceController::class);
+    Route::apiResource('payment-methods', PaymentMethodController::class);
+    Route::apiResource('payments', PaymentController::class);
 
-# Inventory Requests
-php artisan make:request Api/V1/Inventory/StoreProductRequest
-php artisan make:request Api/V1/Inventory/UpdateProductRequest
-
-# Accounting Requests
-php artisan make:request Api/V1/Accounting/StoreInvoiceRequest
-php artisan make:request Api/V1/Accounting/UpdateInvoiceRequest
-php artisan make:request Api/V1/Accounting/StoreExpenseRequest
-
-# HR Requests
-php artisan make:request Api/V1/HR/StoreEmployeeRequest
-php artisan make:request Api/V1/HR/UpdateEmployeeRequest
-php artisan make:request Api/V1/HR/StoreLeaveRequest
+    // HR
+    Route::apiResource('employees', EmployeeController::class);
+    Route::apiResource('payrolls', PayrollController::class);
+    Route::apiResource('notifications', NotificationController::class);
+});
 ```
 
 ---
@@ -1635,12 +1111,11 @@ php artisan make:middleware CheckPermission
 ### Phase 4.3: Policies
 
 ```bash
-# Create policies for all major models
+# Create policies for major models
 php artisan make:policy CompanyPolicy --model=Company
-php artisan make:policy ClientPolicy --model=Client
-php artisan make:policy ProjectPolicy --model=Project
+php artisan make:policy CustomerPolicy --model=Customer
+php artisan make:policy ProductPolicy --model=Product
 php artisan make:policy InvoicePolicy --model=Invoice
-php artisan make:policy ExpensePolicy --model=Expense
 ```
 
 ---
@@ -1650,11 +1125,8 @@ php artisan make:policy ExpensePolicy --model=Expense
 ```bash
 # Create seeders
 php artisan make:seeder RoleSeeder
-php artisan make:seeder PermissionSeeder
 php artisan make:seeder CompanySeeder
 php artisan make:seeder UserSeeder
-php artisan make:seeder ClientStatusSeeder
-php artisan make:seeder LeadStatusSeeder
 ```
 
 **Default Roles:**
@@ -1662,7 +1134,6 @@ php artisan make:seeder LeadStatusSeeder
 - Company Admin
 - Manager
 - Accountant
-- HR Manager
 - Employee
 
 ---
@@ -1670,251 +1141,38 @@ php artisan make:seeder LeadStatusSeeder
 ## 🚀 المرحلة الخامسة: Advanced Features
 
 ### Phase 5.1: Notifications System
-
-```bash
-# Create notification classes
-php artisan make:notification NewLeadNotification
-php artisan make:notification TaskAssignedNotification
-php artisan make:notification InvoicePaidNotification
-php artisan make:notification LeaveRequestNotification
-php artisan make:notification ContractExpiringNotification
-```
-
-**Channels:** Database, Mail, SMS (optional)
+- New Customer notification
+- Low Stock notification
+- Invoice Paid notification
+- Payroll processed notification
 
 ---
 
-### Phase 5.2: Events & Listeners
-
+### Phase 5.2: Observers
 ```bash
-# Invoice Events
-php artisan make:event InvoiceCreated
-php artisan make:listener SendInvoiceToClient
-php artisan make:listener UpdateAccountingRecords
-
-# Task Events
-php artisan make:event TaskAssigned
-php artisan make:listener NotifyAssignedUsers
-
-# Leave Events
-php artisan make:event LeaveRequested
-php artisan make:listener NotifyManager
-```
-
----
-
-### Phase 5.3: Jobs (Queue)
-
-```bash
-# Create jobs for heavy operations
-php artisan make:job GenerateInvoicePDF
-php artisan make:job SendBulkEmails
-php artisan make:job ProcessMonthlyPayroll
-php artisan make:job GenerateMonthlyReports
-php artisan make:job BackupDatabase
-```
-
----
-
-### Phase 5.4: Observers
-
-```bash
-# Create observers for audit logging
-php artisan make:observer ClientObserver --model=Client
+# Audit logging
+php artisan make:observer CustomerObserver --model=Customer
+php artisan make:observer ProductObserver --model=Product
 php artisan make:observer InvoiceObserver --model=Invoice
-php artisan make:observer ProjectObserver --model=Project
 ```
 
 ---
 
-### Phase 5.5: Services Layer
-
-**Create Service Classes for Business Logic:**
-
-```
-app/Services/
-├── CRM/
-│   ├── ClientService.php
-│   ├── LeadService.php
-│   └── OpportunityService.php
-├── Sales/
-│   ├── QuotationService.php
-│   └── ContractService.php
-├── Accounting/
-│   ├── InvoiceService.php
-│   └── PaymentService.php
-└── Reports/
-    └── ReportService.php
-```
-
----
-
-### Phase 5.6: PDF Generation
-
-```bash
-# Install DomPDF or similar
-composer require barryvdh/laravel-dompdf
-```
-
-**Create PDF Templates:**
-- Invoice PDF
-- Quotation PDF
-- Contract PDF
-- Payslip PDF
-
----
-
-### Phase 5.7: File Upload & Storage
-
-**Configure Storage Disks in `config/filesystems.php`**
-
-**Create Upload Handlers:**
-- Company Logo
-- User Avatar
-- Expense Receipts
-- Contract Documents
-- Product Images
+### Phase 5.3: Services Layer
+- `CustomerService.php`
+- `InventoryService.php`
+- `AccountingService.php`
+- `PayrollService.php`
 
 ---
 
 ## ✅ المرحلة السادسة: Testing & Deployment
 
-### Phase 6.1: Feature Tests
-
-```bash
-# Auth Tests
-php artisan make:test --phpunit Auth/LoginTest
-php artisan make:test --phpunit Auth/RegisterTest
-
-# CRM Tests
-php artisan make:test --phpunit CRM/ClientTest
-php artisan make:test --phpunit CRM/LeadTest
-
-# Sales Tests
-php artisan make:test --phpunit Sales/QuotationTest
-php artisan make:test --phpunit Sales/ContractTest
-
-# Projects Tests
-php artisan make:test --phpunit Projects/ProjectTest
-php artisan make:test --phpunit Projects/TaskTest
-
-# Accounting Tests
-php artisan make:test --phpunit Accounting/InvoiceTest
-php artisan make:test --phpunit Accounting/PaymentTest
-
-# HR Tests
-php artisan make:test --phpunit HR/AttendanceTest
-php artisan make:test --phpunit HR/LeaveTest
-```
-
-**Run Tests:**
-```bash
-php artisan test --compact
-```
-
----
-
-### Phase 6.2: Code Quality
-
-```bash
-# Run Pint for code formatting
-vendor/bin/pint --dirty
-
-# Static Analysis (optional)
-composer require --dev larastan/larastan
-./vendor/bin/phpstan analyse
-```
-
----
-
-### Phase 6.3: API Documentation
-
-**Options:**
-1. **Scribe** (Recommended)
-```bash
-composer require --dev knuckleswtf/scribe
-php artisan scribe:generate
-```
-
-2. **L5-Swagger**
-```bash
-composer require darkaonline/l5-swagger
-```
-
----
-
-### Phase 6.4: Performance Optimization
-
-```bash
-# Cache configuration
-php artisan config:cache
-
-# Cache routes
-php artisan route:cache
-
-# Optimize autoloader
-composer install --optimize-autoloader --no-dev
-
-# Enable OPcache in production
-```
-
-**Database Optimization:**
-- Add proper indexes
-- Use eager loading to prevent N+1
-- Implement query caching where appropriate
-
----
-
-### Phase 6.5: Security Checklist
-
-- [ ] CSRF Protection enabled
-- [ ] SQL Injection prevention (use Eloquent/Query Builder)
-- [ ] XSS Protection (escape output)
-- [ ] Rate Limiting on API routes
-- [ ] Input validation on all requests
-- [ ] File upload validation
-- [ ] Secure password hashing (bcrypt)
-- [ ] HTTPS in production
-- [ ] Environment variables secured
-- [ ] Database credentials secured
-
----
-
-### Phase 6.6: Deployment
-
-**Deployment Checklist:**
-
-1. **Environment Setup**
-```bash
-cp .env.example .env
-php artisan key:generate
-```
-
-2. **Database**
-```bash
-php artisan migrate --force
-php artisan db:seed --force
-```
-
-3. **Storage**
-```bash
-php artisan storage:link
-```
-
-4. **Permissions**
-```bash
-chmod -R 775 storage bootstrap/cache
-```
-
-5. **Queue Worker** (if using queues)
-```bash
-php artisan queue:work --daemon
-```
-
-6. **Scheduler** (add to crontab)
-```bash
-* * * * * cd /path-to-project && php artisan schedule:run >> /dev/null 2>&1
-```
+- Auth Tests
+- CRM Tests
+- Inventory Tests
+- Accounting Tests
+- HR Tests
 
 ---
 
@@ -1922,164 +1180,30 @@ php artisan queue:work --daemon
 
 | Phase | Duration | Tasks |
 |-------|----------|-------|
-| **Phase 1: Database & Models** | 2-3 weeks | 40+ tables, migrations, models, factories, seeders |
-| **Phase 2: Controllers** | 3-4 weeks | 30+ controllers with business logic |
-| **Phase 3: APIs & Resources** | 2 weeks | API resources, form requests, routes |
-| **Phase 4: Auth & Authorization** | 1 week | Sanctum, policies, middleware |
-| **Phase 5: Advanced Features** | 3-4 weeks | Notifications, events, jobs, PDFs |
-| **Phase 6: Testing & Deployment** | 2-3 weeks | Tests, documentation, optimization |
-| **Total** | **13-17 weeks** | Full ERP system |
+| **Phase 1: Database & Models** | 2 weeks | 20+ tables, migrations, models |
+| **Phase 2: Controllers** | 3 weeks | API Controllers with logic |
+| **Phase 3: APIs & Resources** | 1 week | Resources & Routes |
+| **Phase 4: Auth & Authorization** | 1 week | Sanctum & Policies |
+| **Phase 5: Advanced Features** | 2 weeks | Notifications & Services |
+| **Phase 6: Testing & Deployment** | 1 week | Tests & Documentation |
+| **Total** | **10 weeks** | Full ERP system |
 
 ---
 
 ## 🎯 Priority Order (MVP First Approach)
 
-### Sprint 1: Core Foundation (Week 1-2)
-- [ ] Companies, Branches, Departments
-- [ ] Users, Roles, Permissions
-- [ ] Authentication (Login, Register)
-- [ ] Basic Dashboard
+### Sprint 1: Core Foundation
+- Companies, Branches, Users, Roles
 
-### Sprint 2: CRM Module (Week 3-4)
-- [ ] Clients Management
-- [ ] Leads Management
-- [ ] Follow-ups
-- [ ] Client Statuses
+### Sprint 2: CRM & Inventory
+- Customers, Categories, Products, Stocks
 
-### Sprint 3: Sales Module (Week 5-6)
-- [ ] Quotations
-- [ ] Contracts
-- [ ] PDF Generation
+### Sprint 3: Sales & Accounting
+- SalesOrders, Invoices, Payments, Wallets
 
-### Sprint 4: Projects Module (Week 7-8)
-- [ ] Projects
-- [ ] Tasks
-- [ ] Task Assignments
-
-### Sprint 5: Accounting Module (Week 9-10)
-- [ ] Invoices
-- [ ] Payments
-- [ ] Expenses
-
-### Sprint 6: Inventory Module (Week 11-12)
-- [ ] Products
-- [ ] Categories
-- [ ] Purchase Orders
-- [ ] Stock Management
-
-### Sprint 7: HR Module (Week 13-14)
-- [ ] Employees
-- [ ] Attendance
-- [ ] Leaves
-- [ ] Payroll
-
-### Sprint 8: Polish & Deploy (Week 15-17)
-- [ ] Notifications
-- [ ] Reports
-- [ ] Testing
-- [ ] Documentation
-- [ ] Deployment
-
----
-
-## 📝 Notes & Best Practices
-
-### Multi-Tenancy Implementation
-- كل جدول يحتوي على `company_id`
-- استخدم Global Scopes للتصفية التلقائية
-- Middleware للتحقق من انتماء المستخدم للشركة
-
-### Soft Deletes
-- استخدم `SoftDeletes` في جميع الجداول الرئيسية
-- يسمح باسترجاع البيانات المحذوفة
-
-### Audit Logging
-- سجل جميع العمليات المهمة
-- استخدم Observers أو Events
-
-### API Versioning
-- ابدأ بـ `/api/v1`
-- سهل الترقية للإصدارات المستقبلية
-
-### Validation
-- استخدم Form Requests دائماً
-- لا تضع Validation في Controllers
-
-### Code Organization
-- استخدم Services للـ Business Logic
-- Controllers تكون رفيعة (Thin Controllers)
-- Models تحتوي على Relationships فقط
-
----
-
-## 🔧 Useful Commands Reference
-
-```bash
-# Create complete model with migration, factory, seeder
-php artisan make:model ModelName -mfs
-
-# Create API controller
-php artisan make:controller Api/V1/ControllerName --api --model=ModelName
-
-# Create resource
-php artisan make:resource Api/V1/ResourceName
-
-# Create form request
-php artisan make:request StoreModelRequest
-
-# Create policy
-php artisan make:policy ModelPolicy --model=ModelName
-
-# Create test
-php artisan make:test --phpunit ModelTest
-
-# Run migrations
-php artisan migrate
-
-# Run seeders
-php artisan db:seed
-
-# Run tests
-php artisan test --compact
-
-# Format code
-vendor/bin/pint --dirty
-
-# Clear all caches
-php artisan optimize:clear
-```
-
----
-
-## 📚 Additional Resources
-
-- [Laravel 12 Documentation](https://laravel.com/docs/12.x)
-- [Laravel Sanctum](https://laravel.com/docs/12.x/sanctum)
-- [Laravel Best Practices](https://github.com/alexeymezenin/laravel-best-practices)
-- [RESTful API Design](https://restfulapi.net/)
-
----
-
-## ✨ Final Checklist
-
-- [ ] All migrations created and tested
-- [ ] All models with relationships
-- [ ] All controllers with CRUD operations
-- [ ] All API resources created
-- [ ] All form requests with validation
-- [ ] Authentication working (Sanctum)
-- [ ] Authorization implemented (Policies)
-- [ ] Multi-tenancy working
-- [ ] Notifications system
-- [ ] PDF generation
-- [ ] File uploads
-- [ ] Tests written and passing
-- [ ] Code formatted with Pint
-- [ ] API documentation generated
-- [ ] Deployment ready
+### Sprint 4: HR & Notifications
+- Employees, Payrolls, Notifications
 
 ---
 
 **Good Luck! 🚀**
-
-هذا الـ Roadmap شامل لكل خطوة في المشروع. ابدأ بالترتيب واتبع الـ Sprints للحصول على نتائج سريعة!
