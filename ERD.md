@@ -115,3 +115,59 @@ erDiagram
 
 > [!TIP]
 > تم تحديث هذا المخطط ليعكس بنية النظام الحالية والمستهدفة كما هو موضح في الـ [ROADMAP](file:///home/muhammad/Downloads/Laravel%20API-First/ERPSystem/ROADMAP.md).
+
+## 🚀 Implementation Commands | أوامر التنفيذ
+
+يمكنك استخدام الأوامر التالية لإنشاء النماذج (Models) وقواعد البيانات مع الـ Controllers داخل مجلد الـ API:
+
+### 1. الكيانات الأساسية (Foundational Entities)
+```bash
+# Company
+php artisan make:model Company -mfs
+php artisan make:controller Api/CompanyController --api --model=Company --requests
+
+# Branch
+php artisan make:model Branch -mfs
+php artisan make:controller Api/BranchController --api --model=Branch --requests
+```
+
+### 2. التصنيفات والموردين (Catalog & Suppliers)
+```bash
+# Category
+php artisan make:model Category -mfs
+php artisan make:controller Api/CategoryController --api --model=Category --requests
+
+# Supplier
+php artisan make:model Supplier -mfs
+php artisan make:controller Api/SupplierController --api --model=Supplier --requests
+```
+
+### 3. المنتجات والمخزن (Products & Inventory)
+```bash
+# Product
+php artisan make:model Product -mfs
+php artisan make:controller Api/ProductController --api --model=Product --requests
+
+# Inventory
+php artisan make:model Inventory -mfs
+php artisan make:controller Api/InventoryController --api --model=Inventory --requests
+```
+
+### 4. المبيعات والمدفوعات (Sales & Payments)
+```bash
+# Sales Order
+php artisan make:model SalesOrder -mfs
+php artisan make:controller Api/SalesOrderController --api --model=SalesOrder --requests
+
+# Sales Order Item
+php artisan make:model SalesOrderItem -mfs
+php artisan make:controller Api/SalesOrderItemController --api --model=SalesOrderItem --requests
+
+# Payment
+php artisan make:model Payment -mfs
+php artisan make:controller Api/PaymentController --api --model=Payment --requests
+```
+
+> [!NOTE]
+> - علم `-mfs` يقوم بإنشاء (Migration, Factory, Seeder).
+> - الـ Controller يتم إنشاؤه داخل مجلد `Api` مع توفير الـ Form Requests (`Store` & `Update`).
