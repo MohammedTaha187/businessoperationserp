@@ -125,6 +125,7 @@ php artisan make:model Department -mfs
 - email (string, unique)
 - phone (string, nullable)
 - password (string)
+- role (string) -- e.g., 'admin', 'manager', 'employee'
 - avatar (string, nullable)
 - status (enum: active, inactive, suspended)
 - email_verified_at (timestamp, nullable)
@@ -139,37 +140,7 @@ php artisan make:model User -mfs
 
 **Relationships:**
 - belongsTo: Company, Branch, Department
-- belongsToMany: Roles (via user_roles)
 - hasMany: Notifications, etc.
-
----
-
-```sql
--- roles table
-- id (bigint, PK)
-- company_id (FK → companies)
-- name (string)
-- created_at, updated_at
-```
-
-**Model Command:**
-```bash
-php artisan make:model Role -mfs
-```
-
----
-
-```sql
--- user_roles (pivot)
-- user_id (FK → users)
-- role_id (FK → roles)
-```
-
-**Model Command:**
-**Model Command:**
-```bash
-php artisan make:model UserRole -mfs
-```
 
 ---
 
@@ -715,11 +686,6 @@ php artisan make:controller Api/BranchController --api --model=Branch --requests
 php artisan make:controller Api/UserController --api --model=User --requests
 ```
 
-#### RoleController
-```bash
-php artisan make:controller Api/RoleController --api --model=Role --requests
-```
-
 ---
 
 ### Phase 2.3: CRM Controllers
@@ -886,7 +852,7 @@ php artisan make:controller Api/V1/ReportController
 php artisan make:resource Api/CompanyResource
 php artisan make:resource Api/BranchResource
 php artisan make:resource Api/UserResource
-php artisan make:resource Api/RoleResource
+
 
 # CRM Resources
 php artisan make:resource Api/CustomerResource
@@ -932,7 +898,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('companies', CompanyController::class);
     Route::apiResource('branches', BranchController::class);
     Route::apiResource('users', UserController::class);
-    Route::apiResource('roles', RoleController::class);
 
     // CRM
     Route::apiResource('customers', CustomerController::class);
@@ -1000,10 +965,8 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('branches', BranchController::class);
         Route::apiResource('departments', DepartmentController::class);
         
-        // Users & Roles
+        // Users
         Route::apiResource('users', UserController::class);
-        Route::apiResource('roles', RoleController::class);
-        Route::post('users/{user}/assign-role', [UserController::class, 'assignRole']);
         
         // CRM Module
         Route::prefix('crm')->group(function () {
@@ -1087,8 +1050,6 @@ php artisan migrate
 # Multi-tenant middleware
 php artisan make:middleware EnsureUserBelongsToCompany
 
-# Role middleware
-php artisan make:middleware CheckRole
 
 # Permission middleware
 php artisan make:middleware CheckPermission
@@ -1100,7 +1061,6 @@ php artisan make:middleware CheckPermission
 ->withMiddleware(function (Middleware $middleware) {
     $middleware->alias([
         'company' => \App\Http\Middleware\EnsureUserBelongsToCompany::class,
-        'role' => \App\Http\Middleware\CheckRole::class,
         'permission' => \App\Http\Middleware\CheckPermission::class,
     ]);
 })
@@ -1124,7 +1084,6 @@ php artisan make:policy InvoicePolicy --model=Invoice
 
 ```bash
 # Create seeders
-php artisan make:seeder RoleSeeder
 php artisan make:seeder CompanySeeder
 php artisan make:seeder UserSeeder
 ```
@@ -1193,7 +1152,7 @@ php artisan make:observer InvoiceObserver --model=Invoice
 ## 🎯 Priority Order (MVP First Approach)
 
 ### Sprint 1: Core Foundation
-- Companies, Branches, Users, Roles
+- Companies, Branches, Users
 
 ### Sprint 2: CRM & Inventory
 - Customers, Categories, Products, Stocks

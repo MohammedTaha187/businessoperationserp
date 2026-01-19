@@ -11,11 +11,6 @@ COMPANIES ||--o{ BRANCHES : manages
 COMPANIES ||--o{ USERS : owns
 BRANCHES ||--o{ USERS : employs
 
-USERS ||--o{ USER_ROLES : assigned
-ROLES ||--o{ USER_ROLES : includes
-
-COMPANIES ||--o{ ROLES : defines
-
 %% ================= CRM =================
 COMPANIES ||--o{ CUSTOMERS : serves
 COMPANIES ||--o{ LEADS : tracks
@@ -86,17 +81,7 @@ USERS {
     string name
     string email
     string password
-}
-
-ROLES {
-    bigint id PK
-    bigint company_id FK
-    string name
-}
-
-USER_ROLES {
-    bigint user_id FK
-    bigint role_id FK
+    string role
 }
 
 CUSTOMERS {
@@ -268,39 +253,38 @@ NOTIFICATIONS {
 ```
 
 ---
-php artisan make:model Company -mfs --api --requests
-php artisan make:model Branch -mfs --api --requests
-php artisan make:model User -mfs --api --requests
-php artisan make:model Role -mfs --api --requests
-php artisan make:model UserRole -mfs
+php artisan make:model Company -a --api --requests
+php artisan make:model Branch -a --api --requests
+php artisan make:model User -a --api --requests
  
 
-php artisan make:model Customer -mfs --api --requests
-php artisan make:model Lead -mfs --api --requests
-php artisan make:model CustomerNote -mfs --api --requests
+php artisan make:model Customer -a --api --requests
+php artisan make:model Lead -a --api --requests
+php artisan make:model CustomerNote -a --api --requests
 
 
 
-php artisan make:model Category -mfs --api --requests
-php artisan make:model Subcategory -mfs --api --requests
-php artisan make:model Product -mfs --api --requests
-php artisan make:model Stock -mfs --api --requests
-php artisan make:model InventoryTransaction -mfs --api --requests
+php artisan make:model Category -a --api --requestsw
+php artisan make:model Subcategory -a --api --requests
+php artisan make:model Product -a --api --requests
+php artisan make:model Stock -a --api --requests
+php artisan make:model InventoryTransaction -a --api --requests
 
-php artisan make:model SalesOrder -mfs --api --requests
-php artisan make:model SalesOrderItem -mfs --api --requests
-php artisan make:model Supplier -mfs --api --requests
-php artisan make:model PurchaseOrder -mfs --api --requests
-php artisan make:model PurchaseOrderItem -mfs --api --requests
-
-
-php artisan make:model Wallet -mfs --api --requests
-php artisan make:model Transaction -mfs --api --requests
-php artisan make:model Invoice -mfs --api --requests
-php artisan make:model Payment -mfs --api --requests
-php artisan make:model PaymentMethod -mfs --api --requests
+php artisan make:model SalesOrder -a --api --requests
+php artisan make:model SalesOrderItem -a --api --requests
+php artisan make:model Supplier -a --api --requests
+php artisan make:model PurchaseOrder -a --api --requests
+php artisan make:model PurchaseOrderItem -a --api --requests
 
 
-php artisan make:model Employee -mfs --api --requests
-php artisan make:model Payroll -mfs --api --requests
-php artisan make:model Notification -mfs --api --requests
+php artisan make:model Wallet -a --api --requests
+php artisan make:model Transaction -a --api --requests
+php artisan make:model Invoice -a --api --requests
+php artisan make:model Payment -a --api --requests
+php artisan make:model PaymentMethod -a --api --requests
+
+
+php artisan make:model Employee -a --api --requests
+php artisan make:model Payroll -a --api --requests
+php artisan make:model Notification -a --api --requests
+                                                                                                                                                                                                                          
