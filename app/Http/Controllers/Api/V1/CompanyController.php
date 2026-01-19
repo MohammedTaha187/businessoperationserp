@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Requests\StoreCompanyRequest;
-use App\Http\Requests\UpdateCompanyRequest;
+use App\Http\Requests\V1\Company\StoreCompanyRequest;
+use App\Http\Requests\V1\Company\UpdateCompanyRequest;
 use App\Models\Company;
 
 class CompanyController extends Controller

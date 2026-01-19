@@ -1,59 +1,182 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🏢 ERP System - منصة B2B متكاملة
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+<div align="center">
 
-## About Laravel
+![Laravel](https://img.shields.io/badge/laravel-%23FF2D20.svg?style=for-the-badge&logo=laravel&logoColor=white)
+![PHP](https://img.shields.io/badge/php-%23777BB4.svg?style=for-the-badge&logo=php&logoColor=white)
+![MySQL](https://img.shields.io/badge/mysql-%2300f.svg?style=for-the-badge&logo=mysql&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+**نظام إدارة مؤسسات متكامل بمعمارية API-First حديثة**
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+[الميزات](#-الميزات) • [البدء السريع](#-البدء-السريع) • [الهيكل](#-هيكل-المشروع) • [التوثيق](#-التوثيق)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+</div>
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## 📋 نبذة عن المشروع
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+نظام ERP شامل ومتطور مبني بمعمارية API-First لإدارة العمليات التجارية المعقدة. يدعم النظام إدارة متعددة المستأجرين (Multi-Tenancy) مع صلاحيات هرمية قوية وآمنة. تم تطويره باستخدام أحدث تقنيات PHP و Laravel لضمان أداء عالي وقابلية التوسع.
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## 🚀 الميزات الرئيسية
 
-### Premium Partners
+### 🏛️ **إدارة المؤسسات**
+- دعم شامل لـ Multi-Tenancy
+- إدارة الشركات والفروع المتعددة
+- هرمية تنظيمية مرنة
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### 🔐 **الأمان والصلاحيات**
+- صلاحيات دقيقة (Granular Permissions)
+- ثلاث مستويات دخول: `super-admin`, `manager`, `employee`
+- مصادقة آمنة باستخدام Laravel Sanctum
+- حماية معمارية على مستوى API
 
-## Contributing
+### 📊 **الموديولات الرئيسية**
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+| الموديول | الوظائف |
+|---------|--------|
+| **Core** | إدارة الشركات، الفروع، والمستخدمين |
+| **CRM** | العملاء، الفرص البيعية، ملاحظات التفاعل |
+| **Inventory** | التصنيفات، المنتجات، المخزون، العمليات |
+| **Sales** | الطلبات، تفاصيل البيع، الفواتير |
+| **Accounting** | المحافظ، السجلات المالية، طرق الدفع |
+| **HR** | الموظفون، الرواتب، الإشعارات |
 
-## Code of Conduct
+### 🔌 **معمارية متقدمة**
+- API-First Design مع إصدارات واضحة
+- هيكل نظيف ومعياري
+- سهولة التوسع والصيانة
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+---
 
-## Security Vulnerabilities
+## 🛠️ التقنيات المستخدمة
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+| التقنية | الإصدار | الدور |
+|--------|--------|------|
+| **Laravel** | 12.x | Framework الرئيسي |
+| **PHP** | 8.4+ | لغة البرمجة |
+| **MySQL** | Latest | قاعدة البيانات |
+| **Spatie Permission** | v6+ | إدارة الأدوار والصلاحيات |
+| **Laravel Sanctum** | Latest | مصادقة API آمنة |
 
-## License
+---
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## ⚡ البدء السريع
+
+### 1️⃣ استنساخ المستودع
+```bash
+git clone <repository-url>
+cd ERPSystem
+```
+
+### 2️⃣ تثبيت المكتبات
+```bash
+composer install
+```
+
+### 3️⃣ إعداد البيئة
+```bash
+cp .env.example .env
+php artisan key:generate
+```
+
+> 💡 **ملاحظة مهمة**: حدّث ملف `.env` ببيانات قاعدة البيانات الخاصة بك
+
+### 4️⃣ تشغيل الهجرات والبيانات الأساسية
+```bash
+php artisan migrate:fresh --seed
+```
+
+### 5️⃣ بدء السيرفر
+```bash
+php artisan serve
+```
+
+السيرفر سيكون متاحاً على: `http://localhost:8000`
+
+---
+
+## 🔑 بيانات الدخول الافتراضية
+
+بعد تشغيل البيانات الأساسية، يمكنك تسجيل الدخول برصيد المسؤول الأول:
+
+```
+📧 البريد الإلكتروني: admin@erp.com
+🔐 كلمة المرور: password
+👤 النوع: Super Admin
+```
+
+---
+
+## 📂 هيكل المشروع
+
+يتبع المشروع معمارية منظمة وقابلة للتوسع:
+
+```
+app/Http/
+├── Controllers/Api/V1/        # متحكمات API - الإصدار الأول
+├── Requests/V1/               # التحقق من صحة البيانات حسب الموديول
+└── Middleware/
+
+app/Policies/V1/               # سياسات التفويض (Authorization)
+
+database/
+├── factories/V1/              # مصانع البيانات الوهمية
+└── seeders/V1/                # البيانات الأساسية الأولية
+```
+
+### 🎯 المجلدات الرئيسية
+
+- **`Controllers`**: منطق المعالجة والاستجابات API
+- **`Requests`**: التحقق من البيانات والقواعد المخصصة
+- **`Policies`**: تحديد من لديه صلاحية تنفيذ العملية
+- **`Factories`**: إنشاء بيانات وهمية للاختبار
+- **`Seeders`**: ملء قاعدة البيانات ببيانات أولية
+
+---
+
+## 📚 التوثيق
+
+للمزيد من المعلومات التفصيلية، يرجى مراجعة:
+
+- 📊 **[ERD.md](./ERD.md)** - مخطط العلاقات بين جداول قاعدة البيانات
+- 🗺️ **[ROADMAP.md](./ROADMAP.md)** - خطة التطوير والمراحل المستقبلية
+- 🔌 **[API Documentation](./docs/API.md)** - توثيق نقاط نهاية API
+
+---
+
+## 🤝 المساهمة
+
+نرحب بالمساهمات! يرجى:
+1. Fork المشروع
+2. إنشاء فرع للميزة الجديدة (`git checkout -b feature/amazing-feature`)
+3. Commit التغييرات (`git commit -m 'Add amazing feature'`)
+4. Push إلى الفرع (`git push origin feature/amazing-feature`)
+5. فتح Pull Request
+
+---
+
+## 📝 الترخيص
+
+هذا المشروع مرخص تحت رخصة MIT. انظر ملف [LICENSE](./LICENSE) للمزيد من التفاصيل.
+
+---
+
+## 📞 الدعم والتواصل
+
+- 📧 **البريد الإلكتروني**: support@example.com
+- 💬 **المشاكل والأسئلة**: استخدم [GitHub Issues](../../issues)
+- 📖 **التوثيق**: [Wiki المشروع](../../wiki)
+
+---
+
+<div align="center">
+
+**صُنع بـ ❤️ باستخدام Laravel**
+
+[![Built with Love](https://img.shields.io/badge/Built%20with-Love-red?style=flat-square)](https://github.com)
+
+</div>

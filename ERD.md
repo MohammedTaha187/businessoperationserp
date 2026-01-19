@@ -264,7 +264,7 @@ php artisan make:model CustomerNote -a --api --requests
 
 
 
-php artisan make:model Category -a --api --requestsw
+php artisan make:model Category -a --api --requests
 php artisan make:model Subcategory -a --api --requests
 php artisan make:model Product -a --api --requests
 php artisan make:model Stock -a --api --requests
