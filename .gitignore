@@ -22,3 +22,12 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# AI & Editor Configs
+.cursor/
+.gemini/
+.antigravity/
+.agent/
+.agents/
+_agent/
+_agents/
