@@ -1,182 +1,82 @@
-# 🏢 ERP System - منصة B2B متكاملة
+# 🏢 Business Operations ERP
 
-<div align="center">
+[![Laravel](https://img.shields.io/badge/laravel-%23FF2D20.svg?style=for-the-badge&logo=laravel&logoColor=white)](https://laravel.com)
+[![PHP Search](https://img.shields.io/badge/php-%23777BB4.svg?style=for-the-badge&logo=php&logoColor=white)](https://php.net)
+[![MySQL](https://img.shields.io/badge/mysql-%2300f.svg?style=for-the-badge&logo=mysql&logoColor=white)](https://mysql.com)
 
-![Laravel](https://img.shields.io/badge/laravel-%23FF2D20.svg?style=for-the-badge&logo=laravel&logoColor=white)
-![PHP](https://img.shields.io/badge/php-%23777BB4.svg?style=for-the-badge&logo=php&logoColor=white)
-![MySQL](https://img.shields.io/badge/mysql-%2300f.svg?style=for-the-badge&logo=mysql&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)
-
-**نظام إدارة مؤسسات متكامل بمعمارية API-First حديثة**
-
-[الميزات](#-الميزات) • [البدء السريع](#-البدء-السريع) • [الهيكل](#-هيكل-المشروع) • [التوثيق](#-التوثيق)
-
-</div>
+**Professional B2B ERP Platform built with a modern API-First architecture.**
 
 ---
 
-## 📋 نبذة عن المشروع
+## 📋 About the Project
+A comprehensive, enterprise-grade ERP system tailored for industrial supply and service companies. Built with **Laravel 12**, it features multi-tenant data isolation, advanced security, and seamless financial integrations.
 
-نظام ERP شامل ومتطور مبني بمعمارية API-First لإدارة العمليات التجارية المعقدة. يدعم النظام إدارة متعددة المستأجرين (Multi-Tenancy) مع صلاحيات هرمية قوية وآمنة. تم تطويره باستخدام أحدث تقنيات PHP و Laravel لضمان أداء عالي وقابلية التوسع.
-
----
-
-## 🚀 الميزات الرئيسية
-
-### 🏛️ **إدارة المؤسسات**
-- دعم شامل لـ Multi-Tenancy
-- إدارة الشركات والفروع المتعددة
-- هرمية تنظيمية مرنة
-
-### 🔐 **الأمان والصلاحيات**
-- صلاحيات دقيقة (Granular Permissions)
-- ثلاث مستويات دخول: `super-admin`, `manager`, `employee`
-- مصادقة آمنة باستخدام Laravel Sanctum
-- حماية معمارية على مستوى API
-
-### 📊 **الموديولات الرئيسية**
-
-| الموديول | الوظائف |
-|---------|--------|
-| **Core** | إدارة الشركات، الفروع، والمستخدمين |
-| **CRM** | العملاء، الفرص البيعية، ملاحظات التفاعل |
-| **Inventory** | التصنيفات، المنتجات، المخزون، العمليات |
-| **Sales** | الطلبات، تفاصيل البيع، الفواتير |
-| **Accounting** | المحافظ، السجلات المالية، طرق الدفع |
-| **HR** | الموظفون، الرواتب، الإشعارات |
-
-### 🔌 **معمارية متقدمة**
-- API-First Design مع إصدارات واضحة
-- هيكل نظيف ومعياري
-- سهولة التوسع والصيانة
+### Key Highlights
+- **Architecture**: Service-Layer & Repository Pattern for clean logic.
+- **Enterprise Features**: Multilingual support, professional reporting (PDF/Excel), and robust media management.
+- **Security**: Granular RBAC, stateless API authentication, and 6-digit OTP verification.
+- **Fintech**: Integrated with Stripe, PayPal, Paymob, and Kashier.
 
 ---
 
-## 🛠️ التقنيات المستخدمة
-
-| التقنية | الإصدار | الدور |
-|--------|--------|------|
-| **Laravel** | 12.x | Framework الرئيسي |
-| **PHP** | 8.4+ | لغة البرمجة |
-| **MySQL** | Latest | قاعدة البيانات |
-| **Spatie Permission** | v6+ | إدارة الأدوار والصلاحيات |
-| **Laravel Sanctum** | Latest | مصادقة API آمنة |
+## 🚀 Main Modules
+- **CRM**: Customers, Leads, Interaction Notes, and Opportunities.
+- **Inventory**: Category management, Multi-branch Stock tracking, and Automated alerts.
+- **Finances**: Multi-gateway Payments, Invoicing, Wallets, and Transaction journaling.
+- **HR Layer**: Employee management, Salary calculations, and Notifications.
 
 ---
 
-## ⚡ البدء السريع
+## 🛠️ Quick Start
 
-### 1️⃣ استنساخ المستودع
+### 1. Prerequisites
+- PHP 8.4+
+- Composer
+- MySQL
+
+### 2. Setup
 ```bash
+# Clone the repository
 git clone <repository-url>
-cd ERPSystem
-```
+cd businessoperationserp
 
-### 2️⃣ تثبيت المكتبات
-```bash
+# Install dependencies
 composer install
-```
+npm install
 
-### 3️⃣ إعداد البيئة
-```bash
+# Setup Environment
 cp .env.example .env
 php artisan key:generate
 ```
+*Update your `.env` with DB and Mail credentials.*
 
-> 💡 **ملاحظة مهمة**: حدّث ملف `.env` ببيانات قاعدة البيانات الخاصة بك
-
-### 4️⃣ تشغيل الهجرات والبيانات الأساسية
+### 3. Initialize Database
 ```bash
-php artisan migrate:fresh --seed
+php artisan migrate --seed
 ```
 
-### 5️⃣ بدء السيرفر
+### 4. Serve
 ```bash
 php artisan serve
 ```
 
-السيرفر سيكون متاحاً على: `http://localhost:8000`
+---
+
+## 🔑 Default Credentials
+After seeding, you can log in with:
+- **Email**: `admin@erp.com`
+- **Password**: `password`
+- **Role**: `Super Admin`
 
 ---
 
-## 🔑 بيانات الدخول الافتراضية
-
-بعد تشغيل البيانات الأساسية، يمكنك تسجيل الدخول برصيد المسؤول الأول:
-
-```
-📧 البريد الإلكتروني: admin@erp.com
-🔐 كلمة المرور: password
-👤 النوع: Super Admin
-```
-
----
-
-## 📂 هيكل المشروع
-
-يتبع المشروع معمارية منظمة وقابلة للتوسع:
-
-```
-app/Http/
-├── Controllers/Api/V1/        # متحكمات API - الإصدار الأول
-├── Requests/V1/               # التحقق من صحة البيانات حسب الموديول
-└── Middleware/
-
-app/Policies/V1/               # سياسات التفويض (Authorization)
-
-database/
-├── factories/V1/              # مصانع البيانات الوهمية
-└── seeders/V1/                # البيانات الأساسية الأولية
-```
-
-### 🎯 المجلدات الرئيسية
-
-- **`Controllers`**: منطق المعالجة والاستجابات API
-- **`Requests`**: التحقق من البيانات والقواعد المخصصة
-- **`Policies`**: تحديد من لديه صلاحية تنفيذ العملية
-- **`Factories`**: إنشاء بيانات وهمية للاختبار
-- **`Seeders`**: ملء قاعدة البيانات ببيانات أولية
-
----
-
-## 📚 التوثيق
-
-للمزيد من المعلومات التفصيلية، يرجى مراجعة:
-
-- 📊 **[ERD.md](./ERD.md)** - مخطط العلاقات بين جداول قاعدة البيانات
-- 🗺️ **[ROADMAP.md](./ROADMAP.md)** - خطة التطوير والمراحل المستقبلية
-- 🔌 **[API Documentation](./docs/API.md)** - توثيق نقاط نهاية API
-
----
-
-## 🤝 المساهمة
-
-نرحب بالمساهمات! يرجى:
-1. Fork المشروع
-2. إنشاء فرع للميزة الجديدة (`git checkout -b feature/amazing-feature`)
-3. Commit التغييرات (`git commit -m 'Add amazing feature'`)
-4. Push إلى الفرع (`git push origin feature/amazing-feature`)
-5. فتح Pull Request
-
----
-
-## 📝 الترخيص
-
-هذا المشروع مرخص تحت رخصة MIT. انظر ملف [LICENSE](./LICENSE) للمزيد من التفاصيل.
-
----
-
-## 📞 الدعم والتواصل
-
-- 📧 **البريد الإلكتروني**: support@example.com
-- 💬 **المشاكل والأسئلة**: استخدم [GitHub Issues](../../issues)
-- 📖 **التوثيق**: [Wiki المشروع](../../wiki)
+## 📚 Documentation
+- 🗺️ **[ROADMAP.md](./ROADMAP.md)**: Detailed phase-by-phase development plan (English).
+- 📊 **[ROADMAP_AR.md](./ROADMAP_AR.md)**: Original Arabic documentation.
+- 🔌 **[Postman Collection](./postman_collection.json)**: API testing suite.
 
 ---
 
 <div align="center">
-
-**صُنع بـ ❤️ باستخدام Laravel**
-
-[![Built with Love](https://img.shields.io/badge/Built%20with-Love-red?style=flat-square)](https://github.com)
-
+Built with ❤️ by the ERP Team
 </div>

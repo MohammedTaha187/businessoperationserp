@@ -13,7 +13,9 @@ return new class extends Migration
     {
         Schema::create('payment_methods', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_id')->constrained()->cascadeOnDelete();
             $table->string('name');
+            $table->enum('type', ['cash', 'bank', 'card', 'online']);
             $table->timestamps();
         });
     }

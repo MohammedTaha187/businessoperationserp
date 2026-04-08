@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Requests\V1\InventoryTransaction\StoreInventoryTransactionRequest;
-use App\Http\Requests\V1\InventoryTransaction\UpdateInventoryTransactionRequest;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\InventoryTransaction\StoreInventoryTransactionRequest;
+use App\Http\Requests\Api\V1\InventoryTransaction\UpdateInventoryTransactionRequest;
+use App\Http\Resources\Api\V1\InventoryTransactionResource;
 use App\Models\InventoryTransaction;
 
 class InventoryTransactionController extends Controller
@@ -13,7 +15,9 @@ class InventoryTransactionController extends Controller
      */
     public function index()
     {
-        //
+        $inventoryTransactions = InventoryTransaction::latest()->paginate(10);
+
+        return $this->paginatedResponse($inventoryTransactions, __('lang.Inventory Transactions retrieved successfully'));
     }
 
     /**
@@ -21,7 +25,9 @@ class InventoryTransactionController extends Controller
      */
     public function store(StoreInventoryTransactionRequest $request)
     {
-        //
+        $inventoryTransaction = InventoryTransaction::create($request->validated());
+
+        return $this->successResponse(new InventoryTransactionResource($inventoryTransaction), __('lang.Inventory Transaction created successfully'), 201);
     }
 
     /**
@@ -29,7 +35,7 @@ class InventoryTransactionController extends Controller
      */
     public function show(InventoryTransaction $inventoryTransaction)
     {
-        //
+        return $this->successResponse(new InventoryTransactionResource($inventoryTransaction), __('lang.Inventory Transaction retrieved successfully'));
     }
 
     /**
@@ -37,7 +43,9 @@ class InventoryTransactionController extends Controller
      */
     public function update(UpdateInventoryTransactionRequest $request, InventoryTransaction $inventoryTransaction)
     {
-        //
+        $inventoryTransaction->update($request->validated());
+
+        return $this->successResponse(new InventoryTransactionResource($inventoryTransaction), __('lang.Inventory Transaction updated successfully'));
     }
 
     /**
@@ -45,6 +53,8 @@ class InventoryTransactionController extends Controller
      */
     public function destroy(InventoryTransaction $inventoryTransaction)
     {
-        //
+        $inventoryTransaction->delete();
+
+        return $this->successResponse(null, __('lang.Inventory Transaction deleted successfully'));
     }
 }

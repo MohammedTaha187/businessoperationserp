@@ -2,49 +2,56 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Requests\V1\Payment\StorePaymentRequest;
-use App\Http\Requests\V1\Payment\UpdatePaymentRequest;
-use App\Models\Payment;
+use App\Http\Controllers\Controller;
+use App\Http\Services\Payments\PaymentService;
+use App\Models\Invoice;
+use App\Models\Order;
+use App\Traits\BaseApiResponse;
+use Exception;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class PaymentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
+    use BaseApiResponse;
+
+    public function __construct(protected PaymentService $paymentService) {}
 
     /**
-     * Store a newly created resource in storage.
+     * بدء عملية الدفع (Checkout)
+     *
+     * @param  Request  $request  [provider, type, id]
      */
-    public function store(StorePaymentRequest $request)
+    public function checkout(Request $request): JsonResponse
     {
-        //
-    }
+        $request->validate([
+            'provider' => 'required|string|in:paymob,stripe,paypal,kashier',
+            'type' => 'required|string|in:invoice,order',
+            'id' => 'required|integer',
+        ]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Payment $payment)
-    {
-        //
-    }
+        try {
+            // تحديد الغرض من الدفع (Model)
+            $payable = match ($request->type) {
+                'invoice' => Invoice::findOrFail($request->id),
+                'order' => Order::findOrFail($request->id),
+            };
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdatePaymentRequest $request, Payment $payment)
-    {
-        //
-    }
+            // التحقق من السعر
+            $amount = $payable->total_amount ?? $payable->amount;
+            $currency = $request->provider === 'paypal' ? 'USD' : 'EGP';
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Payment $payment)
-    {
-        //
+            // إنشاء الدفع والحصول على الرابط
+            $result = $this->paymentService->createPayment(
+                $payable,
+                $request->provider,
+                (float) $amount,
+                $currency
+            );
+
+            return $this->successResponse($result, 'Payment initiated successfully');
+        } catch (Exception $e) {
+            return $this->errorResponse('Payment Failed: '.$e->getMessage(), 400);
+        }
     }
 }

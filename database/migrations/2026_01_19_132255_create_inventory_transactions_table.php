@@ -15,10 +15,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
             $table->foreignId('branch_id')->constrained()->cascadeOnDelete();
-            $table->string('type');
-            $table->integer('quantity');
-            $table->string('reference_type');
-            $table->unsignedBigInteger('reference_id');
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->unsignedBigInteger('reference_id')->nullable();
+            $table->enum('type', ['in', 'out', 'transfer', 'adjustment']);
+            $table->text('notes')->nullable();
             $table->timestamps();
         });
     }

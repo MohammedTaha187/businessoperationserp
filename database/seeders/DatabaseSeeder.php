@@ -2,12 +2,12 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use App\Models\Branch;
 use App\Models\Company;
-use Illuminate\Database\Seeder;
+use App\Models\User;
 use Database\Seeders\V1\RolePermissionSeeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -38,7 +38,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Admin User',
             'email' => 'admin@erp.com',
             'password' => bcrypt('password'),
-            'role' => 'super-admin',
+            'type' => 'super-admin',
         ]);
 
         $admin->assignRole('super-admin');
@@ -47,7 +47,7 @@ class DatabaseSeeder extends Seeder
         User::factory(5)->create([
             'company_id' => $company->id,
             'branch_id' => $branch->id,
-            'role' => 'employee',
+            'type' => 'employee',
         ])->each(function ($user) {
             $user->assignRole('employee');
         });

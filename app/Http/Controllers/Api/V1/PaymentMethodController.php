@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Requests\V1\PaymentMethod\StorePaymentMethodRequest;
-use App\Http\Requests\V1\PaymentMethod\UpdatePaymentMethodRequest;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\PaymentMethod\StorePaymentMethodRequest;
+use App\Http\Requests\Api\V1\PaymentMethod\UpdatePaymentMethodRequest;
+use App\Http\Resources\Api\V1\PaymentMethodResource;
 use App\Models\PaymentMethod;
 
 class PaymentMethodController extends Controller
@@ -13,7 +15,9 @@ class PaymentMethodController extends Controller
      */
     public function index()
     {
-        //
+        $paymentMethods = PaymentMethod::latest()->paginate(10);
+
+        return $this->paginatedResponse($paymentMethods, __('lang.Payment Methods retrieved successfully'));
     }
 
     /**
@@ -21,7 +25,9 @@ class PaymentMethodController extends Controller
      */
     public function store(StorePaymentMethodRequest $request)
     {
-        //
+        $paymentMethod = PaymentMethod::create($request->validated());
+
+        return $this->successResponse(new PaymentMethodResource($paymentMethod), __('lang.Payment Method created successfully'), 201);
     }
 
     /**
@@ -29,7 +35,7 @@ class PaymentMethodController extends Controller
      */
     public function show(PaymentMethod $paymentMethod)
     {
-        //
+        return $this->successResponse(new PaymentMethodResource($paymentMethod), __('lang.Payment Method retrieved successfully'));
     }
 
     /**
@@ -37,7 +43,9 @@ class PaymentMethodController extends Controller
      */
     public function update(UpdatePaymentMethodRequest $request, PaymentMethod $paymentMethod)
     {
-        //
+        $paymentMethod->update($request->validated());
+
+        return $this->successResponse(new PaymentMethodResource($paymentMethod), __('lang.Payment Method updated successfully'));
     }
 
     /**
@@ -45,6 +53,8 @@ class PaymentMethodController extends Controller
      */
     public function destroy(PaymentMethod $paymentMethod)
     {
-        //
+        $paymentMethod->delete();
+
+        return $this->successResponse(null, __('lang.Payment Method deleted successfully'));
     }
 }

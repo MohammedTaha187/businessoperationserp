@@ -11,4 +11,14 @@ class PaymentMethod extends Model
     use HasFactory;
 
     protected $guarded = ['id', 'created_at', 'updated_at'];
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
+
+    public function financialRecords()
+    {
+        return $this->hasMany(FinancialRecord::class);
+    }
 }

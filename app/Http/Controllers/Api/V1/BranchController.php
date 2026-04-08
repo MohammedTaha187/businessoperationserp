@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Requests\V1\Branch\StoreBranchRequest;
-use App\Http\Requests\V1\Branch\UpdateBranchRequest;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\Branch\StoreBranchRequest;
+use App\Http\Requests\Api\V1\Branch\UpdateBranchRequest;
+use App\Http\Resources\Api\V1\BranchResource;
 use App\Models\Branch;
 
 class BranchController extends Controller
@@ -13,7 +15,9 @@ class BranchController extends Controller
      */
     public function index()
     {
-        //
+        $branches = Branch::latest()->paginate(10);
+
+        return $this->paginatedResponse($branches, __('lang.Branches retrieved successfully'));
     }
 
     /**
@@ -21,7 +25,9 @@ class BranchController extends Controller
      */
     public function store(StoreBranchRequest $request)
     {
-        //
+        $branch = Branch::create($request->validated());
+
+        return $this->successResponse(new BranchResource($branch), __('lang.Branch created successfully'), 201);
     }
 
     /**
@@ -29,7 +35,7 @@ class BranchController extends Controller
      */
     public function show(Branch $branch)
     {
-        //
+        return $this->successResponse(new BranchResource($branch), __('lang.Branch retrieved successfully'));
     }
 
     /**
@@ -37,7 +43,9 @@ class BranchController extends Controller
      */
     public function update(UpdateBranchRequest $request, Branch $branch)
     {
-        //
+        $branch->update($request->validated());
+
+        return $this->successResponse(new BranchResource($branch), __('lang.Branch updated successfully'));
     }
 
     /**
@@ -45,6 +53,8 @@ class BranchController extends Controller
      */
     public function destroy(Branch $branch)
     {
-        //
+        $branch->delete();
+
+        return $this->successResponse(null, __('lang.Branch deleted successfully'));
     }
 }

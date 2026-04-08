@@ -14,8 +14,10 @@ return new class extends Migration
         Schema::create('wallets', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('branch_id')->constrained()->cascadeOnDelete();
             $table->string('name');
             $table->decimal('balance', 10, 2);
+            $table->string('currency');
             $table->timestamps();
         });
     }

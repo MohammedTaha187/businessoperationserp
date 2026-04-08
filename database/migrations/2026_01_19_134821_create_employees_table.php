@@ -15,8 +15,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('branch_id')->constrained()->cascadeOnDelete();
-            $table->string('job_title');
-            $table->decimal('salary', 10, 2);
+            $table->string('national_id');
+            $table->string('department');
+            $table->string('position');
+            $table->date('hire_date');
+            $table->decimal('basic_salary', 10, 2);
             $table->timestamps();
         });
     }

@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Requests\V1\Customer\StoreCustomerRequest;
-use App\Http\Requests\V1\Customer\UpdateCustomerRequest;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\Customer\StoreCustomerRequest;
+use App\Http\Requests\Api\V1\Customer\UpdateCustomerRequest;
+use App\Http\Resources\Api\V1\CustomerResource;
 use App\Models\Customer;
 
 class CustomerController extends Controller
@@ -13,7 +15,9 @@ class CustomerController extends Controller
      */
     public function index()
     {
-        //
+        $customers = Customer::latest()->paginate(10);
+
+        return $this->paginatedResponse($customers, __('lang.Customers retrieved successfully'));
     }
 
     /**
@@ -21,7 +25,9 @@ class CustomerController extends Controller
      */
     public function store(StoreCustomerRequest $request)
     {
-        //
+        $customer = Customer::create($request->validated());
+
+        return $this->successResponse(new CustomerResource($customer), __('lang.Customer created successfully'), 201);
     }
 
     /**
@@ -29,7 +35,7 @@ class CustomerController extends Controller
      */
     public function show(Customer $customer)
     {
-        //
+        return $this->successResponse(new CustomerResource($customer), __('lang.Customer retrieved successfully'));
     }
 
     /**
@@ -37,7 +43,9 @@ class CustomerController extends Controller
      */
     public function update(UpdateCustomerRequest $request, Customer $customer)
     {
-        //
+        $customer->update($request->validated());
+
+        return $this->successResponse(new CustomerResource($customer), __('lang.Customer updated successfully'));
     }
 
     /**
@@ -45,6 +53,8 @@ class CustomerController extends Controller
      */
     public function destroy(Customer $customer)
     {
-        //
+        $customer->delete();
+
+        return $this->successResponse(null, __('lang.Customer deleted successfully'));
     }
 }

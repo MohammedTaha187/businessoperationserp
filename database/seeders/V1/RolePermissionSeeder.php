@@ -3,8 +3,8 @@
 namespace Database\Seeders\V1;
 
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class RolePermissionSeeder extends Seeder
 {
@@ -18,20 +18,11 @@ class RolePermissionSeeder extends Seeder
 
         // Define Modules and Permissions
         $modules = [
-            'companies',
-            'branches',
-            'users',
-            'customers',
-            'leads',
-            'categories',
-            'products',
-            'inventory',
-            'sales',
-            'invoices',
-            'payments',
-            'wallets',
-            'employees',
-            'payrolls'
+            'companies', 'branches', 'users', 'customers',
+            'opportunities', 'interaction-notes', 'categories', 'products',
+            'inventories', 'inventory-transactions', 'orders', 'order-items',
+            'invoices', 'wallets', 'payment-methods', 'financial-records',
+            'employees', 'salaries', 'notifications',
         ];
 
         $actions = ['view', 'create', 'edit', 'delete'];
@@ -51,28 +42,22 @@ class RolePermissionSeeder extends Seeder
         // 2. Manager - High level access
         $manager = Role::firstOrCreate(['name' => 'manager']);
         $manager->givePermissionTo([
-            'view customers',
-            'create customers',
-            'edit customers',
-            'view leads',
-            'create leads',
-            'edit leads',
-            'view products',
-            'create products',
-            'edit products',
-            'view inventory',
-            'view sales',
-            'view invoices',
-            'view employees'
+            'view customers', 'create customers', 'edit customers',
+            'view opportunities', 'create opportunities', 'edit opportunities',
+            'view products', 'create products', 'edit products',
+            'view inventories', 'view inventory-transactions',
+            'view orders', 'create orders', 'edit orders',
+            'view invoices', 'view employees', 'view financial-records',
         ]);
 
         // 3. Employee - Basic access
         $employee = Role::firstOrCreate(['name' => 'employee']);
         $employee->givePermissionTo([
             'view customers',
-            'view leads',
+            'view opportunities',
             'view products',
-            'view inventory'
+            'view inventories',
+            'view orders',
         ]);
     }
 }

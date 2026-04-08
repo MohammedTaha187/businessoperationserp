@@ -17,6 +17,9 @@ return new class extends Migration
             $table->string('email');
             $table->string('phone');
             $table->string('address');
+            $table->string('logo')->nullable();
+            $table->string('website')->nullable();
+            $table->string('tax_number')->nullable();
             $table->timestamps();
         });
     }

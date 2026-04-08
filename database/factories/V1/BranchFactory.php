@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class BranchFactory extends Factory
 {
     protected $model = \App\Models\Branch::class;
+
     /**
      * Define the model's default state.
      *
@@ -19,8 +20,9 @@ class BranchFactory extends Factory
     {
         return [
             'company_id' => \App\Models\Company::factory(),
-            'name' => $this->faker->city() . ' Branch',
-            'location' => $this->faker->address(),
+            'name' => $this->faker->city().' Branch',
+            'address' => $this->faker->address(),
+            'phone' => $this->faker->phoneNumber(),
         ];
     }
 }

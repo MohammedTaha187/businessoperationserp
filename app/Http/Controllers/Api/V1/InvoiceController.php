@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Requests\V1\Invoice\StoreInvoiceRequest;
-use App\Http\Requests\V1\Invoice\UpdateInvoiceRequest;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\Invoice\StoreInvoiceRequest;
+use App\Http\Requests\Api\V1\Invoice\UpdateInvoiceRequest;
+use App\Http\Resources\Api\V1\InvoiceResource;
 use App\Models\Invoice;
 
 class InvoiceController extends Controller
@@ -13,7 +15,9 @@ class InvoiceController extends Controller
      */
     public function index()
     {
-        //
+        $invoices = Invoice::with(['order.customer', 'order.branch'])->latest()->paginate(10);
+
+        return $this->paginatedResponse($invoices, __('lang.Invoices retrieved successfully'));
     }
 
     /**
@@ -21,7 +25,9 @@ class InvoiceController extends Controller
      */
     public function store(StoreInvoiceRequest $request)
     {
-        //
+        $invoice = Invoice::create($request->validated());
+
+        return $this->successResponse(new InvoiceResource($invoice->load('order')), __('lang.Invoice created successfully'), 201);
     }
 
     /**
@@ -29,7 +35,7 @@ class InvoiceController extends Controller
      */
     public function show(Invoice $invoice)
     {
-        //
+        return $this->successResponse(new InvoiceResource($invoice->load(['order.customer', 'order.branch', 'order.items.product'])), __('lang.Invoice retrieved successfully'));
     }
 
     /**
@@ -37,7 +43,9 @@ class InvoiceController extends Controller
      */
     public function update(UpdateInvoiceRequest $request, Invoice $invoice)
     {
-        //
+        $invoice->update($request->validated());
+
+        return $this->successResponse(new InvoiceResource($invoice), __('lang.Invoice updated successfully'));
     }
 
     /**
@@ -45,6 +53,8 @@ class InvoiceController extends Controller
      */
     public function destroy(Invoice $invoice)
     {
-        //
+        $invoice->delete();
+
+        return $this->successResponse(null, __('lang.Invoice deleted successfully'));
     }
 }

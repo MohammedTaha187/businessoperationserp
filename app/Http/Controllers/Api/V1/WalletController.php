@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Requests\V1\Wallet\StoreWalletRequest;
-use App\Http\Requests\V1\Wallet\UpdateWalletRequest;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\Wallet\StoreWalletRequest;
+use App\Http\Requests\Api\V1\Wallet\UpdateWalletRequest;
+use App\Http\Resources\Api\V1\WalletResource;
 use App\Models\Wallet;
 
 class WalletController extends Controller
@@ -13,7 +15,9 @@ class WalletController extends Controller
      */
     public function index()
     {
-        //
+        $wallets = Wallet::latest()->paginate(10);
+
+        return $this->paginatedResponse($wallets, __('lang.Wallets retrieved successfully'));
     }
 
     /**
@@ -21,7 +25,9 @@ class WalletController extends Controller
      */
     public function store(StoreWalletRequest $request)
     {
-        //
+        $wallet = Wallet::create($request->validated());
+
+        return $this->successResponse(new WalletResource($wallet), __('lang.Wallet created successfully'), 201);
     }
 
     /**
@@ -29,7 +35,7 @@ class WalletController extends Controller
      */
     public function show(Wallet $wallet)
     {
-        //
+        return $this->successResponse(new WalletResource($wallet), __('lang.Wallet retrieved successfully'));
     }
 
     /**
@@ -37,7 +43,9 @@ class WalletController extends Controller
      */
     public function update(UpdateWalletRequest $request, Wallet $wallet)
     {
-        //
+        $wallet->update($request->validated());
+
+        return $this->successResponse(new WalletResource($wallet), __('lang.Wallet updated successfully'));
     }
 
     /**
@@ -45,6 +53,8 @@ class WalletController extends Controller
      */
     public function destroy(Wallet $wallet)
     {
-        //
+        $wallet->delete();
+
+        return $this->successResponse(null, __('lang.Wallet deleted successfully'));
     }
 }

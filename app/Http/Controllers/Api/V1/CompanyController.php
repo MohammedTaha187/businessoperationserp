@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Requests\V1\Company\StoreCompanyRequest;
-use App\Http\Requests\V1\Company\UpdateCompanyRequest;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\Company\StoreCompanyRequest;
+use App\Http\Requests\Api\V1\Company\UpdateCompanyRequest;
+use App\Http\Resources\Api\V1\CompanyResource;
 use App\Models\Company;
 
 class CompanyController extends Controller
@@ -13,15 +15,9 @@ class CompanyController extends Controller
      */
     public function index()
     {
-        //
-    }
+        $companies = Company::latest()->paginate(10);
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        return $this->paginatedResponse($companies, __('lang.Companies retrieved successfully'));
     }
 
     /**
@@ -29,7 +25,9 @@ class CompanyController extends Controller
      */
     public function store(StoreCompanyRequest $request)
     {
-        //
+        $company = Company::create($request->validated());
+
+        return $this->successResponse(new CompanyResource($company), __('lang.Company created successfully'), 201);
     }
 
     /**
@@ -37,15 +35,7 @@ class CompanyController extends Controller
      */
     public function show(Company $company)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Company $company)
-    {
-        //
+        return $this->successResponse(new CompanyResource($company), __('lang.Company retrieved successfully'));
     }
 
     /**
@@ -53,7 +43,9 @@ class CompanyController extends Controller
      */
     public function update(UpdateCompanyRequest $request, Company $company)
     {
-        //
+        $company->update($request->validated());
+
+        return $this->successResponse(new CompanyResource($company), __('lang.Company updated successfully'));
     }
 
     /**
@@ -61,6 +53,8 @@ class CompanyController extends Controller
      */
     public function destroy(Company $company)
     {
-        //
+        $company->delete();
+
+        return $this->successResponse(null, __('lang.Company deleted successfully'));
     }
 }

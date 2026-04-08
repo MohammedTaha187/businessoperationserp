@@ -14,8 +14,10 @@ return new class extends Migration
         Schema::create('branches', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('manager_id')->nullable();
             $table->string('name');
-            $table->string('location');
+            $table->string('address');
+            $table->string('phone');
             $table->timestamps();
         });
     }
