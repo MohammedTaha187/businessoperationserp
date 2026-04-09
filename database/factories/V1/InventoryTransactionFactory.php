@@ -18,7 +18,12 @@ class InventoryTransactionFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'product_id' => \App\Models\Product::factory(),
+            'branch_id' => \App\Models\Branch::factory(),
+            'user_id' => \App\Models\User::factory(),
+            'reference_id' => null,
+            'type' => fake()->randomElement(['in', 'out', 'transfer', 'adjustment']),
+            'notes' => fake()->sentence(),
         ];
     }
 }

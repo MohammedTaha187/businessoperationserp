@@ -16,8 +16,18 @@ class SalaryFactory extends Factory
      */
     public function definition(): array
     {
+        $basic = fake()->randomFloat(2, 3000, 15000);
+        $bonuses = fake()->randomFloat(2, 0, 2000);
+        $deductions = fake()->randomFloat(2, 0, 500);
         return [
-            //
+            'employee_id' => \App\Models\Employee::factory(),
+            'month' => fake()->monthName(),
+            'year' => 2026,
+            'basic' => $basic,
+            'bonuses' => $bonuses,
+            'deductions' => $deductions,
+            'net' => $basic + $bonuses - $deductions,
+            'status' => fake()->randomElement(['pending', 'paid']),
         ];
     }
 }

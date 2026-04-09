@@ -18,13 +18,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // 1. Run Role & Permission Seeder
         $this->call(RolePermissionSeeder::class);
 
-        // 2. Create a Default Company and Branch
-        $company = Company::factory()->create([
-            'name' => 'Main ERP Company',
-        ]);
+        // 2. Run Comprehensive Mass Seeder
+        $this->call(MassDataSeeder::class);
+
+        // 3. Create a Default Company and Branch (Optional, for demo/dev access)
+        $company = Company::where('name', 'Main ERP Company')->first();
+        if (!$company) {
+            $company = Company::factory()->create(['name' => 'Main ERP Company']);
+        }
 
         $branch = Branch::factory()->create([
             'company_id' => $company->id,

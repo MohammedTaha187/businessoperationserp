@@ -22,9 +22,9 @@ class StoreEmployeeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_id' => ['required', 'exists:users,id'],
-            'branch_id' => ['required', 'exists:branches,id'],
-            'national_id' => ['required', 'exists:nationals,id'],
+            'user_id' => ['sometimes', 'nullable', 'exists:users,id'],
+            'branch_id' => ['sometimes', 'nullable', 'exists:branches,id'],
+            'national_id' => ['required', 'string', 'max:255'],
             'department' => ['required', 'string', 'max:255'],
             'position' => ['required', 'string', 'max:255'],
             'hire_date' => ['required', 'date'],

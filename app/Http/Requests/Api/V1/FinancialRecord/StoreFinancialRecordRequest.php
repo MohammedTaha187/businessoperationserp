@@ -22,9 +22,9 @@ class StoreFinancialRecordRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'company_id' => ['required', 'exists:companies,id'],
-            'wallet_id' => ['required', 'exists:wallets,id'],
-            'payment_method_id' => ['required', 'exists:payment_methods,id'],
+            'company_id' => ['sometimes', 'nullable', 'exists:companies,id'],
+            'wallet_id' => ['sometimes', 'nullable', 'exists:wallets,id'],
+            'payment_method_id' => ['sometimes', 'nullable', 'exists:payment_methods,id'],
             'reference_id' => ['required'],
             'reference_type' => ['required', 'string', 'max:255'],
             'type' => ['required', 'in:income,expense'],

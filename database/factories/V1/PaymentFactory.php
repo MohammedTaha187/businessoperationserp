@@ -18,7 +18,15 @@ class PaymentFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'user_id' => \App\Models\User::factory(),
+            'payable_id' => \App\Models\Invoice::factory(),
+            'payable_type' => \App\Models\Invoice::class,
+            'amount' => fake()->randomFloat(2, 100, 10000),
+            'currency' => 'EGP',
+            'provider' => fake()->randomElement(['paymob', 'stripe', 'fawry', 'manual']),
+            'provider_id' => fake()->unique()->bothify('PAY-####-####'),
+            'status' => fake()->randomElement(['pending', 'success', 'failed']),
+            'extra_details' => null,
         ];
     }
 }

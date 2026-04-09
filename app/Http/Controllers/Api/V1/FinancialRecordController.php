@@ -15,7 +15,7 @@ class FinancialRecordController extends Controller
      */
     public function index()
     {
-        $financialRecords = FinancialRecord::latest()->paginate(10);
+        $financialRecords = FinancialRecord::with(['wallet', 'paymentMethod'])->latest()->paginate(10);
 
         return $this->paginatedResponse($financialRecords, __('lang.Financial Records retrieved successfully'));
     }
@@ -25,7 +25,23 @@ class FinancialRecordController extends Controller
      */
     public function store(StoreFinancialRecordRequest $request)
     {
-        $financialRecord = FinancialRecord::create($request->validated());
+        $data = $request->validated();
+        $user = auth()->user();
+
+        // Auto-inject missing mandatory fields
+        if (empty($data['company_id'])) {
+            $data['company_id'] = $user->company_id;
+        }
+
+        if (empty($data['wallet_id'])) {
+            $data['wallet_id'] = \App\Models\Wallet::where('company_id', $data['company_id'])->first()?->id;
+        }
+
+        if (empty($data['payment_method_id'])) {
+            $data['payment_method_id'] = \App\Models\PaymentMethod::where('company_id', $data['company_id'])->first()?->id;
+        }
+
+        $financialRecord = FinancialRecord::create($data);
 
         return $this->successResponse(new FinancialRecordResource($financialRecord), __('lang.Financial Record created successfully'), 201);
     }

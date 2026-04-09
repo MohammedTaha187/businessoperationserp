@@ -18,7 +18,9 @@ class PaymentMethodFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'company_id' => \App\Models\Company::factory(),
+            'name' => fake()->randomElement(['Cash', 'Bank Transfer', 'Visa', 'MasterCard', 'PayPal', 'Vodafone Cash']),
+            'type' => fake()->randomElement(['cash', 'bank', 'card', 'online']),
         ];
     }
 }

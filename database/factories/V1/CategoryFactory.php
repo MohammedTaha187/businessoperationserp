@@ -18,7 +18,8 @@ class CategoryFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'company_id' => \App\Models\Company::factory(),
+            'name' => fake()->word(),
         ];
     }
 }

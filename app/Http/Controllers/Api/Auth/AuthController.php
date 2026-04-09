@@ -135,7 +135,9 @@ class AuthController extends Controller
      */
     public function redirectToProvider($provider)
     {
-        return Socialite::driver($provider)->stateless()->redirect();
+        $redirectUrl = Socialite::driver($provider)->stateless()->redirect()->getTargetUrl();
+
+        return response()->json(['url' => $redirectUrl]);
     }
 
     /**
@@ -148,7 +150,10 @@ class AuthController extends Controller
 
             $result = $this->authService->socialLogin($provider, $socialUser);
 
-            return $this->successResponse($result, __('lang.Logged in successfully via').' '.ucfirst($provider));
+            $token = $result['token'];
+            $frontendUrl = env('FRONTEND_URL') ?: 'http://localhost:3003';
+
+            return redirect($frontendUrl . '/auth/callback?token=' . $token);
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), 422);
         }

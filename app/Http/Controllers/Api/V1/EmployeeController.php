@@ -15,7 +15,7 @@ class EmployeeController extends Controller
      */
     public function index()
     {
-        $employees = Employee::with(['branch.company'])->get();
+        $employees = Employee::with(['user', 'branch.company'])->get();
 
         return $this->successResponse(EmployeeResource::collection($employees), __('lang.Employees retrieved successfully'));
     }
@@ -25,7 +25,19 @@ class EmployeeController extends Controller
      */
     public function store(StoreEmployeeRequest $request)
     {
-        $employee = Employee::create($request->validated());
+        $data = $request->validated();
+        $user = auth()->user();
+
+        // Auto-assign user and branch if missing
+        if (empty($data['user_id'])) {
+            $data['user_id'] = $user->id;
+        }
+
+        if (empty($data['branch_id'])) {
+            $data['branch_id'] = $user->branch_id;
+        }
+
+        $employee = Employee::create($data);
 
         return $this->successResponse(new EmployeeResource($employee->load(['branch.company'])), __('lang.Employee created successfully'), 201);
     }

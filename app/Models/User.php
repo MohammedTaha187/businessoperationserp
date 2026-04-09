@@ -25,6 +25,7 @@ class User extends Authenticatable implements HasMedia
         'branch_id',
         'name',
         'email',
+        'image',
         'password',
     ];
 
@@ -89,5 +90,12 @@ class User extends Authenticatable implements HasMedia
     public function employee()
     {
         return $this->hasOne(Employee::class);
+    }
+
+    protected function imageUrl(): \Illuminate\Database\Eloquent\Casts\Attribute
+    {
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(
+            get: fn () => $this->image ? \Illuminate\Support\Facades\Storage::url($this->image) : null,
+        );
     }
 }

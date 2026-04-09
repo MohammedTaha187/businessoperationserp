@@ -18,7 +18,15 @@ class CustomerFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'company_id' => \App\Models\Company::factory(),
+            'branch_id' => \App\Models\Branch::factory(),
+            'name' => fake()->name(),
+            'customer_number' => strtoupper(fake()->unique()->bothify('CUST-####')),
+            'contact_person' => fake()->name(),
+            'email' => fake()->unique()->safeEmail(),
+            'phone' => fake()->phoneNumber(),
+            'status' => fake()->randomElement(['active', 'inactive', 'lead']),
+            'address' => fake()->address(),
         ];
     }
 }

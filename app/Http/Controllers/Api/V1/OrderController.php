@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\V1\Order\StoreOrderRequest;
 use App\Http\Requests\V1\Order\UpdateOrderRequest;
 use App\Http\Resources\Api\V1\OrderResource;
-use App\Http\Services\Api\V1\OrderService;
+use App\Services\Api\V1\OrderService;
 use App\Models\Order;
 
 class OrderController extends Controller

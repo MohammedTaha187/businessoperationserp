@@ -43,4 +43,22 @@ class Product extends Model implements HasMedia
     {
         return $this->hasMany(OrderItem::class);
     }
+
+    /**
+     * Scope a query to only include products within a price range.
+     */
+    public function scopePriceBetween($query, ...$prices)
+    {
+        // Handle both array and comma-separated string from QueryBuilder
+        if (count($prices) === 1 && is_string($prices[0])) {
+            $prices = explode(',', $prices[0]);
+        } elseif (is_array($prices[0])) {
+            $prices = $prices[0];
+        }
+
+        return $query->whereBetween('price', [
+            $prices[0] ?? 0,
+            $prices[1] ?? 999999
+        ]);
+    }
 }

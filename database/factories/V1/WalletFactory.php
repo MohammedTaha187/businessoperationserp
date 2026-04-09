@@ -18,7 +18,11 @@ class WalletFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'company_id' => \App\Models\Company::factory(),
+            'branch_id' => \App\Models\Branch::factory(),
+            'name' => fake()->randomElement(['Safe', 'Cash Register', 'Main Account', 'Petty Cash']),
+            'balance' => fake()->randomFloat(2, 0, 100000),
+            'currency' => fake()->currencyCode(),
         ];
     }
 }

@@ -18,7 +18,13 @@ class EmployeeFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'user_id' => \App\Models\User::factory(),
+            'branch_id' => \App\Models\Branch::factory(),
+            'national_id' => fake()->unique()->numerify('##########'),
+            'department' => fake()->randomElement(['Sales', 'Accounting', 'HR', 'IT', 'Operations']),
+            'position' => fake()->jobTitle(),
+            'hire_date' => fake()->date(),
+            'basic_salary' => fake()->randomFloat(2, 3000, 20000),
         ];
     }
 }

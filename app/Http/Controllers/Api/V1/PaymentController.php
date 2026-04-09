@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Services\Payments\PaymentService;
+use App\Services\Payments\PaymentService;
 use App\Models\Invoice;
 use App\Models\Order;
 use App\Traits\BaseApiResponse;
